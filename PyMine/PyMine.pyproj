@@ -1,0 +1,442 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>0117804c-5f54-4054-acf8-1e77fc16d682</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <ProjectTypeGuids>{1b580a1a-fdb3-4b32-83e1-6407eb2722e6};{349c5851-65df-11da-9384-00065b846f21};{888888a0-9f3d-457c-b088-3a5042f75d52}</ProjectTypeGuids>
+    <StartupFile>
+    </StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <LaunchProvider>Web launcher</LaunchProvider>
+    <OutputPath>.</OutputPath>
+    <PythonWsgiHandler>app.wsgi_app</PythonWsgiHandler>
+    <Name>PyMine</Name>
+    <RootNamespace>PyMine</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\pymine\block\AcaciaDoor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\block\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\Collectable.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\command\data\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\command\defaults\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\command\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\entity\AI\pathfinding\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\entity\AI\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\entity\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\block\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\entity\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\inventory\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\level\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\player\cheat\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\player\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\plugin\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\server\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\event\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\inventory\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\IPlayer.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\item\enchantment\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\item\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\lang\Installer\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\lang\locale\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\lang\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\anvil\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\generic\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\io\leveldb\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\io\region\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\io\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\leveldb\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\format\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\biome\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\hell\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\noise\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\normal\biome\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\normal\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\object\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\populator\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\generator\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\particle\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\sound\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\weather\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\level\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\maths\AxisAlignedBB.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\maths\const.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\maths\Vector2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\maths\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\maths\Vector3.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\metadata\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\nbt\tag\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\nbt\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\protocol\types\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\protocol\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\query\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\rcon\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\upnp\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\network\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\packs\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\permission\ServerOperator.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\permission\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\plugin\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\utils\TextFormat.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\resources\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\scheduler\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\tile\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\updater\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\utils\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\wizard\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\raklib\protocol\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\raklib\server\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\raklib\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\spl\stubs\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\spl\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\pymine\block\" />
+    <Folder Include="src\pymine\command\" />
+    <Folder Include="src\pymine\command\data\" />
+    <Folder Include="src\pymine\command\defaults\" />
+    <Folder Include="src\pymine\entity\AI\" />
+    <Folder Include="src\pymine\entity\AI\pathfinding\" />
+    <Folder Include="src\pymine\event\" />
+    <Folder Include="src\pymine\event\block\" />
+    <Folder Include="src\pymine\event\entity\" />
+    <Folder Include="src\pymine\event\inventory\" />
+    <Folder Include="src\pymine\event\level\" />
+    <Folder Include="src\pymine\event\player\" />
+    <Folder Include="src\pymine\event\player\cheat\" />
+    <Folder Include="src\pymine\event\plugin\" />
+    <Folder Include="src\pymine\event\server\" />
+    <Folder Include="src\pymine\inventory\" />
+    <Folder Include="src\pymine\item\" />
+    <Folder Include="src\pymine\item\enchantment\" />
+    <Folder Include="src\pymine\lang\" />
+    <Folder Include="src\pymine\lang\Installer\" />
+    <Folder Include="src\pymine\lang\locale\" />
+    <Folder Include="src\pymine\level\" />
+    <Folder Include="src\pymine\entity\" />
+    <Folder Include="src\pymine\level\format\" />
+    <Folder Include="src\pymine\level\format\anvil\" />
+    <Folder Include="src\pymine\level\format\generic\" />
+    <Folder Include="src\pymine\level\format\io\" />
+    <Folder Include="src\pymine\level\format\io\leveldb\" />
+    <Folder Include="src\pymine\level\format\io\region\" />
+    <Folder Include="src\pymine\level\format\leveldb\" />
+    <Folder Include="src\pymine\level\generator\" />
+    <Folder Include="src\pymine\level\generator\biome\" />
+    <Folder Include="src\pymine\level\generator\hell\" />
+    <Folder Include="src\pymine\level\generator\noise\" />
+    <Folder Include="src\pymine\level\generator\normal\" />
+    <Folder Include="src\pymine\level\generator\normal\biome\" />
+    <Folder Include="src\pymine\level\generator\object\" />
+    <Folder Include="src\pymine\level\generator\populator\" />
+    <Folder Include="src\pymine\level\particle\" />
+    <Folder Include="src\pymine\level\sound\" />
+    <Folder Include="src\pymine\level\weather\" />
+    <Folder Include="src\pymine\maths\" />
+    <Folder Include="src\pymine\metadata\" />
+    <Folder Include="src\pymine\nbt\" />
+    <Folder Include="src\pymine\nbt\tag\" />
+    <Folder Include="src\pymine\network\" />
+    <Folder Include="src\pymine\network\protocol\" />
+    <Folder Include="src\pymine\network\protocol\types\" />
+    <Folder Include="src\pymine\network\query\" />
+    <Folder Include="src\pymine\network\rcon\" />
+    <Folder Include="src\pymine\network\upnp\" />
+    <Folder Include="src\pymine\packs\" />
+    <Folder Include="src\pymine\permission\" />
+    <Folder Include="src\pymine\plugin\" />
+    <Folder Include="src\pymine\" />
+    <Folder Include="src\pymine\resources\" />
+    <Folder Include="src\pymine\scheduler\" />
+    <Folder Include="src\pymine\tile\" />
+    <Folder Include="src\pymine\updater\" />
+    <Folder Include="src\pymine\utils\" />
+    <Folder Include="src\pymine\wizard\" />
+    <Folder Include="src\raklib\" />
+    <Folder Include="src\raklib\protocol\" />
+    <Folder Include="src\raklib\server\" />
+    <Folder Include="src\spl\" />
+    <Folder Include="src\spl\stubs\" />
+    <Folder Include="src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="src\pymine\lang\Installer\af_ZA.ini" />
+    <Content Include="src\pymine\lang\Installer\ar_SA.ini" />
+    <Content Include="src\pymine\lang\Installer\cs_CZ.ini" />
+    <Content Include="src\pymine\lang\Installer\de_DE.ini" />
+    <Content Include="src\pymine\lang\Installer\el_GR.ini" />
+    <Content Include="src\pymine\lang\Installer\en.ini" />
+    <Content Include="src\pymine\lang\Installer\en_PT.ini" />
+    <Content Include="src\pymine\lang\Installer\en_US.ini" />
+    <Content Include="src\pymine\lang\Installer\es_ES.ini" />
+    <Content Include="src\pymine\lang\Installer\et_EE.ini" />
+    <Content Include="src\pymine\lang\Installer\fi_FI.ini" />
+    <Content Include="src\pymine\lang\Installer\fr_FR.ini" />
+    <Content Include="src\pymine\lang\Installer\ga_IE.ini" />
+    <Content Include="src\pymine\lang\Installer\he_IL.ini" />
+    <Content Include="src\pymine\lang\Installer\id_ID.ini" />
+    <Content Include="src\pymine\lang\Installer\it_IT.ini" />
+    <Content Include="src\pymine\lang\Installer\ja_JP.ini" />
+    <Content Include="src\pymine\lang\Installer\ko_KR.ini" />
+    <Content Include="src\pymine\lang\Installer\lv_LV.ini" />
+    <Content Include="src\pymine\lang\Installer\ms_MY.ini" />
+    <Content Include="src\pymine\lang\Installer\mt_MT.ini" />
+    <Content Include="src\pymine\lang\Installer\nl_NL.ini" />
+    <Content Include="src\pymine\lang\Installer\no_NO.ini" />
+    <Content Include="src\pymine\lang\Installer\pl_PL.ini" />
+    <Content Include="src\pymine\lang\Installer\pt_PT.ini" />
+    <Content Include="src\pymine\lang\Installer\ru_RU.ini" />
+    <Content Include="src\pymine\lang\Installer\sv_SE.ini" />
+    <Content Include="src\pymine\lang\Installer\th_TH.ini" />
+    <Content Include="src\pymine\lang\Installer\tlh_AA.ini" />
+    <Content Include="src\pymine\lang\Installer\tr_TR.ini" />
+    <Content Include="src\pymine\lang\Installer\uk_UA.ini" />
+    <Content Include="src\pymine\lang\Installer\vi_VN.ini" />
+    <Content Include="src\pymine\lang\Installer\zh_CN.ini" />
+    <Content Include="src\pymine\lang\Installer\zu_ZA.ini" />
+    <Content Include="src\pymine\lang\locale\afr.ini" />
+    <Content Include="src\pymine\lang\locale\ara.ini" />
+    <Content Include="src\pymine\lang\locale\ces.ini" />
+    <Content Include="src\pymine\lang\locale\crowdin.yml" />
+    <Content Include="src\pymine\lang\locale\deu.ini" />
+    <Content Include="src\pymine\lang\locale\ell.ini" />
+    <Content Include="src\pymine\lang\locale\eng.ini" />
+    <Content Include="src\pymine\lang\locale\est.ini" />
+    <Content Include="src\pymine\lang\locale\fin.ini" />
+    <Content Include="src\pymine\lang\locale\fra.ini" />
+    <Content Include="src\pymine\lang\locale\gle.ini" />
+    <Content Include="src\pymine\lang\locale\heb.ini" />
+    <Content Include="src\pymine\lang\locale\hrv.ini" />
+    <Content Include="src\pymine\lang\locale\hun.ini" />
+    <Content Include="src\pymine\lang\locale\ind.ini" />
+    <Content Include="src\pymine\lang\locale\ita.ini" />
+    <Content Include="src\pymine\lang\locale\jpn.ini" />
+    <Content Include="src\pymine\lang\locale\kor.ini" />
+    <Content Include="src\pymine\lang\locale\lav.ini" />
+    <Content Include="src\pymine\lang\locale\mlt.ini" />
+    <Content Include="src\pymine\lang\locale\msa.ini" />
+    <Content Include="src\pymine\lang\locale\nld.ini" />
+    <Content Include="src\pymine\lang\locale\nor.ini" />
+    <Content Include="src\pymine\lang\locale\pol.ini" />
+    <Content Include="src\pymine\lang\locale\por.ini" />
+    <Content Include="src\pymine\lang\locale\README.md" />
+    <Content Include="src\pymine\lang\locale\rus.ini" />
+    <Content Include="src\pymine\lang\locale\spa.ini" />
+    <Content Include="src\pymine\lang\locale\swe.ini" />
+    <Content Include="src\pymine\lang\locale\tgl.ini" />
+    <Content Include="src\pymine\lang\locale\tha.ini" />
+    <Content Include="src\pymine\lang\locale\tlh.ini" />
+    <Content Include="src\pymine\lang\locale\tur.ini" />
+    <Content Include="src\pymine\lang\locale\ukr.ini" />
+    <Content Include="src\pymine\lang\locale\vie.ini" />
+    <Content Include="src\pymine\lang\locale\zho-cn.ini" />
+    <Content Include="src\pymine\lang\locale\zho.ini" />
+    <Content Include="src\pymine\lang\locale\zul.ini" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
+  <!-- Specify pre- and post-build commands in the BeforeBuild and 
+       AfterBuild targets below. -->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <AutoAssignPort>True</AutoAssignPort>
+          <UseCustomServer>True</UseCustomServer>
+          <CustomServerUrl>http://localhost</CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}" User="">
+        <WebProjectProperties>
+          <StartPageUrl>
+          </StartPageUrl>
+          <StartAction>CurrentPage</StartAction>
+          <AspNetDebugging>True</AspNetDebugging>
+          <SilverlightDebugging>False</SilverlightDebugging>
+          <NativeDebugging>False</NativeDebugging>
+          <SQLDebugging>False</SQLDebugging>
+          <ExternalProgram>
+          </ExternalProgram>
+          <StartExternalURL>
+          </StartExternalURL>
+          <StartCmdLineArguments>
+          </StartCmdLineArguments>
+          <StartWorkingDirectory>
+          </StartWorkingDirectory>
+          <EnableENC>False</EnableENC>
+          <AlwaysStartWebServerOnDebug>False</AlwaysStartWebServerOnDebug>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
