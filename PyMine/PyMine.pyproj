@@ -159,19 +159,19 @@
     <Compile Include="src\pymine\level\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\pymine\math\AxisAlignedBB.py">
+    <Compile Include="src\pymine\maths\AxisAlignedBB.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\pymine\math\const.py">
+    <Compile Include="src\pymine\maths\const.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\pymine\math\Vector2.py">
+    <Compile Include="src\pymine\maths\Vector2.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\pymine\math\__init__.py">
+    <Compile Include="src\pymine\maths\__init__.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="src\pymine\math\Vector3.py">
+    <Compile Include="src\pymine\maths\Vector3.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\pymine\metadata\__init__.py">
@@ -211,6 +211,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\pymine\plugin\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="src\pymine\utils\TextFormat.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="src\pymine\__init__.py">
@@ -295,7 +298,7 @@
     <Folder Include="src\pymine\level\particle\" />
     <Folder Include="src\pymine\level\sound\" />
     <Folder Include="src\pymine\level\weather\" />
-    <Folder Include="src\pymine\math\" />
+    <Folder Include="src\pymine\maths\" />
     <Folder Include="src\pymine\metadata\" />
     <Folder Include="src\pymine\nbt\" />
     <Folder Include="src\pymine\nbt\tag\" />
