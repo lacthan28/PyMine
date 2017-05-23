@@ -27,6 +27,28 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="block\AcaciaDoor.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="block\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ToanTu\const.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ToanTu\Vector2.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ToanTu\__init__.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ToanTu\Vector3.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="block\" />
+    <Folder Include="ToanTu\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 
