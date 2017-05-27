@@ -230,4 +230,5 @@ class Block(BlockIds, Metadatable, Position):
                        self.fullList[(id << 4) | data] = clas(data)
                        data += 1
                     
-#                     self.solid[id] = block.is
+                    self.solid[id] = block.isSolid()
+                    self.transparent[id] = block.isTransparent()
