@@ -1,5 +1,5 @@
 import os, math, time
-from pymine.event import player
+from src.pymine.event.player import *
 
 class Server(object):
     BROADCAST_CHANNEL_ADMINISTRATIVE = "pymine.broadcast.admin"
@@ -338,7 +338,7 @@ class Server(object):
     #===========================================================================
     def getGamemodeFromString(self, str):
         value = str.lower().strip()
-        if value == string (Player.SURVIVAL) or "survival" or "s":
+        if value == str(Player.SURVIVAL) or "survival" or "s":
             return Player.SURVIVAL
 
         elif string (Player.CREATIVE) or "creative" or "c":
@@ -1727,17 +1727,18 @@ class Server(object):
 
     def disablePlugins(self):
         self.pluginManager.disablePlugins(self)
-    
+
 
     def checkConsole(self):
-        Timings::serverCommandTimer.startTiming(self)
-        if (line=self.console.getLine(self)) != = null):
+        Timings.serverCommandTimer.startTiming(self)
+        line = self.console.getLine(self)
+        if line is not None:
             self.pluginManager.callEvent(ev=ServerCommandEvent(self.consoleSender, line))
-            if ! ev.isCancelled(self)):
+            if not ev.isCancelled(self):
                 self.dispatchCommand(ev.getSender(self), ev.getCommand(self))
             
         
-        Timings::serverCommandTimer.stopTiming(self)
+        Timings.serverCommandTimer.stopTiming(self)
     
 
     #===========================================================================
@@ -2313,20 +2314,20 @@ class Server(object):
 
         self.getMemoryManager(self).check(self)
 
-        Timings::serverTickTimer.stopTiming(self)
+        Timings.serverTickTimer.stopTiming(self)
 
         now = microtime(True)
         self.currentTPS = min(20, 1 / max(0.001, now - tickTime))
         self.currentUse = min(1, (now - tickTime) / 0.05)
 
-        TimingsHandler::tick(self.currentTPS <= self.profilingTickRate)
+        TimingsHandler.tick(self.currentTPS <= self.profilingTickRate)
 
         array_shift(self.tickAverage)
         self.tickAverage[] = self.currentTPS
         array_shift(self.useAverage)
         self.useAverage[] = self.currentUse
 
-        if (self.nextTick - tickTime) < -1):
+        if (self.nextTick - tickTime) < -1:
             self.nextTick = tickTime
         else:
             self.nextTick += 0.05
@@ -2341,5 +2342,4 @@ class Server(object):
     #===========================================================================
     
     def __sleep(self):
-        throw \BadMethodCallException("Cannot serialize Server instance")
-    
+        raise ValueError("Cannot serialize Server instance")
