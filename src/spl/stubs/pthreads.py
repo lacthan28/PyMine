@@ -1,4 +1,5 @@
 import typing
+from .core_c import Traversable
 
 PTHREADS_INHERIT_ALL = 0x111111
 PTHREADS_INHERIT_NONE = 0
@@ -15,14 +16,6 @@ PTHREADS_ALLOW_GLOBALS = 0x10000000
 class Collectable:
     def isGarbage(self):
         pass
-
-
-class iterable:
-    pass
-
-
-class Traversable(iterable):
-    pass
 
 
 class Threaded(Traversable, Collectable):

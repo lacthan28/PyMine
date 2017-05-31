@@ -15,3 +15,23 @@ class ThreadedLoggerAttachment(Threaded, LoggerAttachment):
             self.attachment.addAttachment(ThreadedLoggerAttachment.attachment)
         else:
             self.attachment = ThreadedLoggerAttachment.attachment
+
+    def removeAttachment(self, ThreadedLoggerAttachment):
+        if isinstance(self.attachment, ThreadedLoggerAttachment):
+            if self.attachment is ThreadedLoggerAttachment.attachment:
+                self.attachment = None
+                for ThreadedLoggerAttachment.attachment in ThreadedLoggerAttachment.attachment.getAttachments():
+                    self.addAttachment(ThreadedLoggerAttachment.attachment)
+
+    def removeAttachments(self):
+        if isinstance(self.attachment, ThreadedLoggerAttachment):
+            self.attachment.removeAttachments()
+            self.attachment = None
+
+    def getAttachments(self):
+        attachments = []
+        if isinstance(self.attachment, ThreadedLoggerAttachment):
+            attachments = self.attachment
+            attachments += self.attachment.getAttachments()
+
+        return attachments

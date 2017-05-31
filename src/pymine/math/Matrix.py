@@ -1,4 +1,4 @@
-from src.pymine.math.ArrayAccess import *
+from ...spl.stubs.core_c import ArrayAccess
 from copy import *
 
 

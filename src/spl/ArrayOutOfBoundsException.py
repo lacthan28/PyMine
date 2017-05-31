@@ -1,0 +1,2 @@
+class ArrayOutOfBoundsException(IndexError):
+    pass
