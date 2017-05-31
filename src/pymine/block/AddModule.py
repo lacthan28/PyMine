@@ -1,4 +1,6 @@
-import os, sys
+import os
+
+
 class AddModule:
     def loadImports(path):
         files = os.listdir(path)
@@ -7,7 +9,7 @@ class AddModule:
         for i in range(len(files)):
             name = files[i].split('.')
             if len(name) > 1:
-                if name[1] == 'py' and name[0] != '__init__':
+                if name[1] == 'py' and name[0] != '__init__' and name[0] != 'AddModule':
                     name = name[0]
                     imps.append(name)
 
@@ -18,4 +20,4 @@ class AddModule:
         file.write(toWrite)
         file.close()
 
-    loadImports('')
+    loadImports('E:/PycharmProjects/PyMine/src/pymine/block/')
