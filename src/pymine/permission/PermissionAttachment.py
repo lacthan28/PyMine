@@ -1,0 +1,2 @@
+class PermissionAttachment:
+    pass

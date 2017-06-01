@@ -1,21 +1,20 @@
+from ..isset import *
 from src.pymine.event.TextContainer import *
+from array import *
 
 
 class TranslationContainer:
     params = []
 
-    def __init__(self, text, params=[]):
+    def __init__(self, text, params:array=[]):
         self.__init__(text)
         self.setParameters(params)
 
     def getParameters(self):
         return self.params
 
-    def isset(variable):
-        return variable in locals() or variable in globals()
-
     def getParameter(self, i):
-        return self.isset(self.params[i]) if self.params[i] else None
+        return isset(self.params[i]) if self.params[i] else None
 
     def setParameter(self, i, str):
         if i < 0 or i > len(self.params):
@@ -23,7 +22,7 @@ class TranslationContainer:
 
         self.params[int(i)] = str
 
-    def setParameters(self, params):
+    def setParameters(self, params:array):
         i = 0
         for s in params:
             self.params[i] = str(s)

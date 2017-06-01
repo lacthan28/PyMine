@@ -8,3 +8,6 @@ def interface_exists(interface_name, autoload=True): pass
 
 
 def trait_exists(traitname, autoload): pass
+
+def isset(variable):
+	return variable in locals() or variable in globals()
