@@ -1,42 +1,43 @@
-from permission import ServerOperator
+from .permission.ServerOperator import *
+
+
 class IPlayer(ServerOperator):
-	
-	# :return: bool
-	def isOnline(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: bool
+    def isOnline(self):
+        pass
 
-	# :return: String
-	def getName(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: String
+    def getName(self):
+        pass
 
-	# :return: bool
-	def isBanned(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: bool
+    def isBanned(self):
+        pass
 
-	# :param banned: bool
-	def setBanned(self, banned):
-		raise NotImplementedError("The method not implemented")
+    # :param banned: bool
+    def setBanned(self, banned):
+        pass
 
-	# :return: bool
-	def isWhitelisted(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: bool
+    def isWhitelisted(self):
+        pass
 
-	# :param value: bool
-	def setWhitelisted(self, value):
-		raise NotImplementedError("The method not implemented")
+    # :param value: bool
+    def setWhitelisted(self, value):
+        pass
 
-	# :return: Player|null
-	def getPlayer(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: Player|null
+    def getPlayer(self):
+        pass
 
-	# :return: int|double
-	def getFirstPlayed(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: int|double
+    def getFirstPlayed(self):
+        pass
 
-	# :return: int|double
-	def getLastPlayed(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: int|double
+    def getLastPlayed(self):
+        pass
 
-	# :return: mixed
-	def hasPlayedBefore(self):
-		raise NotImplementedError("The method not implemented")
+    # :return: mixed
+    def hasPlayedBefore(self):
+        pass

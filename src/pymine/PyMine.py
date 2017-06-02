@@ -40,4 +40,16 @@ def dummy(): pass
 
 
 class PyMine:
-    pass
+    VERSION = "2.0dev";
+
+    API_VERSION = "3.0.0";
+
+    CODENAME = "PyMine";
+
+    MINECRAFT_VERSION = "v1.0.9 alpha";
+
+    MINECRAFT_VERSION_NETWORK = "1.0.9";
+
+    PYMINE_VERSION = "0.0.1";
+
+    # if Egg

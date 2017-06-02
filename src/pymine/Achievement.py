@@ -1,7 +1,9 @@
-from src.pymine.event.TranslationContainer import *
-from src.pymine.utils.TextFormat import *
-from src.pymine.Server import *
-from src.pymine.isset import *
+from .Player import *
+from .event.TranslationContainer import *
+from .utils.TextFormat import *
+from .Server import *
+from .isset import *
+from array import *
 
 
 class Achievement:
@@ -19,7 +21,7 @@ class Achievement:
         "diamonds": (["name", "DIAMONDS!"], ["requires", ["acquireIron", ]])
     }
 
-    def broadcast(self, player, achievementId):
+    def broadcast(self, player: Player, achievementId):
         if (isset(Achievement.list[achievementId])):
             translation = TranslationContainer("chat.type.achievement", [player.getDisplayName(),
                                                                          TextFormat.GREEN +
@@ -33,8 +35,8 @@ class Achievement:
 
         return False
 
-    def add(self, achievementId, achievementName, requires=[]):
+    def add(self, achievementId, achievementName, requires:array=[]):
         if (not isset(Achievement.list[achievementId])):
-            Achievement.list[achievementId] = [["name", achievementName], ["requires", requires, ]]
+            Achievement.list[achievementId] = (["name", achievementName], ["requires", requires, ])
             return True
         return False

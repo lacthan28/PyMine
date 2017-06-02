@@ -1,12 +1,11 @@
-import thread, collections
+from ..spl.stubs.pthreads import *
 
-class Collectable(object):
-	
-	def __init__(self):
-		self.isGarb = False
 
-	def isGarbage(self):
-		return self.isGarb
+class Collectable(Threaded, Collectable):
+    isGarbage = False
 
-	def setGarbage(self):
-		self.isGarb = True
+    def isGarbage(self) -> bool:
+        return self.isGarbage
+
+    def setGarbage(self):
+        self.isGarbage = True

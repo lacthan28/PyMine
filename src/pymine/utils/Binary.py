@@ -1,194 +1,178 @@
 import struct, sys, re
-import ctypes
 import decimal
+
+from spl.stubs.core_d import *
+
+BIG_ENDIAN = 0x00
+LITTLE_ENDIAN = 0x01
+ENDIANNESS = struct.pack("d", 1) == "\77\360\0\0\0\0\0\0" if BIG_ENDIAN else LITTLE_ENDIAN
+
+
+def substr(s, start, length=None):
+    """Returns the portion of string specified by the start and length
+    parameters. """
+    if len(s) >= start:
+        if start > 0:
+            return False
+        else:
+            return s[start:]
+    if not length:
+        return s[start:]
+    elif length > 0:
+        return s[start:start + length]
+    else:
+        return s[start:length]
 
 
 class Binary:
-    BIG_ENDIAN = 0x00
-    LITTLE_ENDIAN = 0x01
+    def checkLength(self, string, expect):
+        length = len(string)
+        assert length == expect, "Expected " + expect + " bytes, got " + str(length)
 
-    def substr(self, s, start, length=None):
-        """Returns the portion of string specified by the start and length
-        parameters. """
-        if len(s) >= start:
-            if start > 0:
-                return False
-            else:
-                return s[start:]
-        if not length:
-            return s[start:]
-        elif length > 0:
-            return s[start:start + length]
-        else:
-            return s[start:length]
-
-    def checkLength(self, str, expect):
-        assert len(str) == expect, "Expected " + expect + " bytes, got " + len(str)
-
-    def readTriad(self, str):
-        self.checkLength(str, 3)
-        return struct.unpack("N", "\x00" + str)[1]
+    def readTriad(self, string):
+        self.checkLength(string, 3)
+        return struct.unpack("N", bytes("\x00" + string))[1]
 
     def writeTriad(self, value):
-        self.substr(struct.pack("N", value), 1)
+        substr(struct.pack("N", value), 1)
 
-    def readLTriad(self, str):
-        self.checkLength(str, 3)
-        return struct.unpack("V", str + "\x00")[1]
+    def readLTriad(self, string):
+        self.checkLength(string, 3)
+        return struct.unpack("V", string + "\x00")[1]
 
     def writeLTriad(self, value):
-        self.substr(struct.pack("V", value), 0, -1)
+        substr(struct.pack("V", value), 0, -1)
 
     def readBool(self, b):
-        if self.readByte(b, False) == 0:
-            return False
-        else:
-            return True
+        return self.readByte(b, False) == 0 if False else True
 
     def writeBool(self, b):
-        if b == True:
-            self.writeByte
+        return self.writeByte(b is True if 1 else 0)
 
     def readByte(self, c, signed=True):
         self.checkLength(c, 1)
         b = ord(c[0])
 
         if signed is True:
-            if ctypes.sizeof(ctypes.c_voidp) == 8:
+            if PYTHON_INT_SIZE == 8:
                 return b << 56 >> 56
             else:
                 return b << 24 >> 24
         else:
             return b
 
-    def writeByte(c):
+    def writeByte(self, c):
         return chr(c)
 
-    def readShort(self, str):
-        self.checkLength(str, 2)
-        return struct.unpack("n", str)[1]
+    def readShort(self, string):
+        self.checkLength(string, 2)
+        return struct.unpack("n", string)[1]
 
-    def readSignedShort(self, str):
+    def readSignedShort(self, string):
         self.checkLength(str, 2)
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
-            return struct.unpack("n", str)[1] << 48 >> 48
+        if PYTHON_INT_SIZE == 8:
+            return struct.unpack("n", string)[1] << 48 >> 48
         else:
-            return struct.unpack("n", str)[1] << 16 >> 16
+            return struct.unpack("n", string)[1] << 16 >> 16
 
     def writeShort(self, value):
         return struct.pack("n", value)
 
-    def readLShort(self, str):
-        self.checkLength(str, 2)
-        return struct.unpack("v", str)[1]
+    def readLShort(self, string):
+        self.checkLength(string, 2)
+        return struct.unpack("v", string)[1]
 
-    def readSignedLShort(self, str):
-        self.checkLength(str, 2)
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
-            return struct.unpack("v", str)[1] << 48 >> 48
+    def readSignedLShort(self, string):
+        self.checkLength(string, 2)
+        if PYTHON_INT_SIZE == 8:
+            return struct.unpack("v", string)[1] << 48 >> 48
         else:
-            return struct.unpack("v", str)[1] << 16 >> 16
+            return struct.unpack("v", string)[1] << 16 >> 16
 
     def writeLShort(self, value):
         return struct.pack("v", value)
 
-    def readInt(self, str):
-        self.checkLength(str, 4)
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
-            return struct.unpack("N", str)[1] << 32 >> 32
+    def readInt(self, string):
+        self.checkLength(string, 4)
+        if PYTHON_INT_SIZE == 8:
+            return struct.unpack("N", string)[1] << 32 >> 32
         else:
-            return struct.unpack("N", str)[1]
+            return struct.unpack("N", string)[1]
 
     def writeInt(self, value):
         return struct.pack("N", value)
 
-    def readLInt(self, str):
-        self.checkLength(str, 4)
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
-            return struct.unpack("V", str)[1] << 32 >> 32
+    def readLInt(self, string):
+        self.checkLength(string, 4)
+        if PYTHON_INT_SIZE == 8:
+            return struct.unpack("V", string)[1] << 32 >> 32
         else:
-            return struct.unpack("V", str)[1]
+            return struct.unpack("V", string)[1]
 
     def writeLInt(self, value):
         return struct.pack("V", value)
 
-    def readFloat(self, str, accuracy=-1):
-        self.checkLength(str, 4)
-        if sys.byteorder == Binary.BIG_ENDIAN:
-            value = struct.unpack("f", str)[1]
-        else:
-            value = struct.unpack("f", str[::-1])[1]
+    def readFloat(self, string, accuracy: int = -1):
+        self.checkLength(string, 4)
+        value = ENDIANNESS == BIG_ENDIAN if struct.unpack("f", string)[1] else struct.unpack("f", string[::-1])[1]
         if accuracy > -1:
             return round(value, accuracy)
         else:
             return value
 
     def writeFloat(self, value):
-        if sys.byteorder == Binary.BIG_ENDIAN:
-            return struct.pack("f", value)
-        else:
-            return struct.pack("f", value)[::-1]
+        return ENDIANNESS == BIG_ENDIAN if struct.pack("f", value) else struct.pack("f", value)[::-1]
 
-    def readLFloat(self, str, accuracy=-1):
-        self.checkLength(str, 4)
-        value = sys.byteorder
-        if sys.byteorder == Binary.BIG_ENDIAN:
-            value = struct.unpack("f", str[::-1])[1]
-        else:
-            value = struct.unpack("f", str)[1]
+    def readLFloat(self, string, accuracy: int = -1):
+        self.checkLength(string, 4)
+        value = ENDIANNESS == BIG_ENDIAN if struct.unpack("f", string[::-1])[1] else struct.unpack("f", string)[1]
         if accuracy > -1:
             return round(value, accuracy)
         else:
             return value
 
     def writeLFloat(self, value):
-        if sys.byteorder == Binary.BIG_ENDIAN:
-            return struct.pack("f", value)[::-1]
-        else:
-            return struct.pack("f", value)
+        return ENDIANNESS == BIG_ENDIAN if struct.pack("f", value)[::-1] else struct.pack("f", value)
 
     def printFloat(self, value):
         return re.sub("/(\\.\\d+?)0+/", "1", '%F' % (value))
 
     def readDouble(self, str):
         self.checkLength(str, 8)
-        if sys.byteorder == Binary.BIG_ENDIAN:
+        if ENDIANNESS == BIG_ENDIAN:
             return struct.unpack("d", str)[1]
         else:
             return struct.unpack("d", str[::-1])[1]
 
     def writeDouble(self, value):
-        if sys.byteorder == Binary.BIG_ENDIAN:
+        if ENDIANNESS == BIG_ENDIAN:
             return struct.pack("d", value)
         else:
             return struct.pack("d", value)[::-1]
 
     def readLDouble(self, str):
         self.checkLength(str, 8)
-        if sys.byteorder == Binary.BIG_ENDIAN:
+        if ENDIANNESS == BIG_ENDIAN:
             return struct.unpack("d", str[::-1])[1]
         else:
             return struct.unpack("d", str)[1]
 
     def writeLDouble(self, value):
-        if sys.byteorder == Binary.BIG_ENDIAN:
+        if ENDIANNESS == BIG_ENDIAN:
             return struct.pack("d", value)[::-1]
         else:
             return struct.pack("d", value)
 
     def readLong(self, x):
         self.checkLength(x, 8)
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
-            int = struct.unpack("N*", x)
-            return (int[1] << 32) | int[2]
+        if PYTHON_INT_SIZE == 8:
+            intArr = struct.unpack("N*", x)
+            return (intArr[1] << 32) | intArr[2]
         else:
             value = "0"
-            i = 0
-            while i < 8:
-                decimal.getcontext().prec = 0
+            for i in range(0, 8, 2):
                 value = decimal.Decimal(value) * decimal.Decimal("65536")
-                value = decimal.Decimal(value) + decimal.Decimal(self.readShort(self.substr(x, i, 2)))
-                i += 2
+                value = decimal.Decimal(value) + decimal.Decimal(self.readShort(substr(x, i, 2)))
 
             if value > "9223372036854775807":
                 value = decimal.Decimal(value) + decimal.Decimal("-18446744073709551616")
@@ -196,7 +180,7 @@ class Binary:
             return value
 
     def writeLong(self, value):
-        if ctypes.sizeof(ctypes.c_voidp) == 8:
+        if PYTHON_INT_SIZE == 8:
             return struct.pack("NN", value >> 32, value & 0xFFFFFFFF)
         else:
             x = ""
@@ -218,7 +202,7 @@ class Binary:
         return self.writeLong(value)[::-1]
 
     def readVarInt(self, stream):
-        shift = ctypes.sizeof(ctypes.c_voidp) == 8 if 63 else 31
+        shift = PYTHON_INT_SIZE == 8 if 63 else 31
         raw = self.readUnsignedVarInt(stream)
         temp = (((raw << shift) >> shift) ^ raw) >> 1
         return temp ^ (raw & (1 << shift))
@@ -226,29 +210,26 @@ class Binary:
     def readUnsignedVarInt(self, stream):
         value = 0
         i = 0
-        while b & 0x80:
+        b = stream.encode("ascii")
+        for i in range(stream.encode("ascii"), b & 0x80, 7):
             if (i > 63):
-                raise ValueError("Variant did not terminate after 10 bytes!")
-            b = stream.encode("ascii")
+                raise ValueError("Var int did not terminate after 10 bytes!")
             value |= ((b & 0x7f) << i)
-            i += 7
 
         return value
 
     def writeVarInt(self, v):
-        return self.writeUnsignedVarInt((v << 1) ^ (v >> (ctypes.sizeof(ctypes.c_voidp) == 8 if 63 else 31)))
+        return self.writeUnsignedVarInt((v << 1) ^ (v >> (PYTHON_INT_SIZE == 8 if 63 else 31)))
 
     def writeUnsignedVarInt(self, value):
         buf = ""
-        i = 0
-        while i < 10:
+        for i in range(0, 10):
             if (value >> 7) != 0:
                 buf += chr(value | 0x80)
             else:
                 buf += chr(value & 0x7f)
                 return buf
 
-            value = ((value >> 7) & (sys.maxint >> 6))
-            ++i
+            value = ((value >> 7) & (PYTHON_INT_MAX >> 6))
 
-        raise ValueError("Value too large to be encoded as a varint")
+        raise ValueError("Value too large to be encoded as a var int")
