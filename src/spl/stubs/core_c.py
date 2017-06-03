@@ -31,13 +31,15 @@ class Iterator(Traversable):
 
 
 class ArrayAccess:
-    def offsetExists(self, offset): pass
+    class ArrayAccess(object):
+        def __getitem__(self, key):
+            return self.container
 
-    def offsetGet(self, offset): pass
+    def __setitem__(self, key, value):
+        self.container = value
 
-    def offsetSet(self, offset, value): pass
-
-    def offsetUnset(self, offset): pass
+    def __delitem__(self, key, value):
+        del self.container
 
 
 class Serializable:

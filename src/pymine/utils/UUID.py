@@ -1,10 +1,9 @@
-from ..mt_rand import *
-from ..utils.Binary import *
-from hashlib import md5
-from time import *
-from os import *
-from re import *
+# coding=utf-8
 from binascii import *
+from hashlib import md5
+from re import *
+
+from ..utils.Binary import Binary, substr
 
 
 class UUID:
@@ -29,25 +28,26 @@ class UUID:
         uuid = uuid.strip()
         return self.fromBinary(bin(int(sub("-", "", uuid))), version)
 
-    def fromBinary(self, uuid, version=None):
+    @staticmethod
+    def fromBinary(uuid, version=None):
         if len(uuid) is not 16:
             raise ValueError("Must have exactly 16 bytes")
         return UUID(Binary.readInt(uuid[0:4]), Binary.readInt(uuid[4:8]), Binary.readInt(uuid[8:12]),
                     Binary.readInt(uuid[12:16]), version)
 
-    def fromData(self, data):
+    def fromData(self, *data):
         h = md5()
         h.update("".join(data))
         result = h.digest()
         return self.fromBinary(result, 3)
 
     def fromRandom(self):
-        return self.fromData(Binary.writeInt(time()), Binary.writeShort(getpid()), Binary.writeShort(getuid()),
-                             Binary.writeInt(mt_rand(-0x7fffffff, 0x7fffffff)),
-                             Binary.writeInt(mt_rand(-0x7fffffff, 0x7fffffff)))
+        return self.fromData(Binary.writeInt(), Binary.writeShort(), Binary.writeShort(),
+                             Binary.writeInt(),
+                             Binary.writeInt())
 
     def toBinary(self):
-        return Binary.writeInt(self.parts[0]).Binary.writeInt(self.parts[1]).Binary.writeInt(
+        return Binary.writeInt().Binary.writeInt(self.parts[1]).Binary.writeInt(
             self.parts[2]).Binary.writeInt(self.parts[3])
 
     def toString(self):
@@ -55,10 +55,10 @@ class UUID:
 
         if self.version is not None:
             return substr(hex, 0, 8) + "-" + substr(hex, 8, 4) + "-" + int(self.version, 16) + substr(hex, 13,
-                                                                                                      3) + "-8" + substr(
-                hex, 17, 3) + "-" + substr(hex, 20, 12)
+                                                                                                        3) + '-8' + substr(
+                hex, 17, 3) + '-' + substr(hex, 20, 12)
         return substr(hex, 0, 8) + "-" + substr(hex, 8, 4) + "-" + substr(hex, 12, 4) + "-" + substr(hex, 16,
-                                                                                                     4) + "-" + substr(
+                                                                                                        4) + "-" + substr(
             hex, 20, 12)
 
     def __str__(self):
