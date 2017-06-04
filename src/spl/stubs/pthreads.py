@@ -1,5 +1,6 @@
 import typing
 from .core_c import Traversable
+from celery import worker
 
 PTHREADS_INHERIT_ALL = 0x111111
 PTHREADS_INHERIT_NONE = 0

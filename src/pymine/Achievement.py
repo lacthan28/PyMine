@@ -8,17 +8,17 @@ from array import *
 
 class Achievement:
     list = {
-        "mineWood": (["name", "Getting Wood"], ["requires", []]),
-        "buildWorkBench": (["name", "Benchmarking"], ["requires", ["mineWood", ]]),
-        "buildPickaxe": (["name", "Time to Mine!"], ["requires", ["buildWorkBench", ]]),
-        "buildFurnace": (["name", "Hot Topic"], ["requires", ["buildPickaxe", ]]),
-        "acquireIron": (["name", "Acquire hardware"], ["requires", ["buildFurnace", ]]),
-        "buildHoe": (["name", "Time to Farm!"], ["requires", ["buildWorkBench", ]]),
-        "makeBread": (["name", "Bake Bread"], ["requires", ["buildHoe", ]]),
-        "bakeCake": (["name", "The Lie"], ["requires", ["buildHoe", ]]),
-        "buildBetterPickaxe": (["name", "Getting an Upgrade"], ["requires", ["buildPickaxe", ]]),
-        "buildSword": (["name", "Time to Strike!"], ["requires", ["buildWorkBench", ]]),
-        "diamonds": (["name", "DIAMONDS!"], ["requires", ["acquireIron", ]])
+        "mineWood": [{"name": "Getting Wood"}, {"requires": []}],
+        "buildWorkBench": [{"name": "Benchmarking"}, {"requires": ["mineWood", ]}],
+        "buildPickaxe": [{"name": "Time to Mine!"}, {"requires": ["buildWorkBench", ]}],
+        "buildFurnace": [{"name": "Hot Topic"}, {"requires": ["buildPickaxe", ]}],
+        "acquireIron": [{"name": "Acquire hardware"}, {"requires": ["buildFurnace", ]}],
+        "buildHoe": [{"name": "Time to Farm!"}, {"requires": ["buildWorkBench", ]}],
+        "makeBread": [{"name": "Bake Bread"}, {"requires": ["buildHoe", ]}],
+        "bakeCake": [{"name": "The Lie"}, {"requires": ["buildHoe", ]}],
+        "buildBetterPickaxe": [{"name": "Getting an Upgrade"}, {"requires": ["buildPickaxe", ]}],
+        "buildSword": [{"name": "Time to Strike!"}, {"requires": ["buildWorkBench", ]}],
+        "diamonds": [{"name": "DIAMONDS!"}, {"requires": ["acquireIron", ]}]
     }
 
     def broadcast(self, player: Player, achievementId):
@@ -35,8 +35,8 @@ class Achievement:
 
         return False
 
-    def add(self, achievementId, achievementName, requires:array=[]):
+    def add(self, achievementId, achievementName, requires: array = []):
         if (not isset(Achievement.list[achievementId])):
-            Achievement.list[achievementId] = (["name", achievementName], ["requires", requires, ])
+            Achievement.list[achievementId] = [{"name": achievementName}, {"requires": requires, }]
             return True
         return False

@@ -7,7 +7,8 @@ class stdClass:
 
 
 class iterable:
-    pass
+    def iterable(x):
+        return hasattr(x, '__iter__')
 
 
 class Traversable(iterable):
