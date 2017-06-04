@@ -3,10 +3,8 @@ from ..spl.stubs.core_d import *
 
 is_array = lambda var: isinstance(var, (list, tuple))
 
-global str_repeat
 
-
-def str_repeat(the_str, multiplier)
+def str_repeat(the_str, multiplier):
     return the_str * multiplier
 
 

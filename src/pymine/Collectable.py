@@ -2,10 +2,13 @@ from ..spl.stubs.pthreads import *
 
 
 class Collectable(Threaded, Collectable):
-    isGarbage = False
+    def __init__(self):
+        pass
+
+    varIsGarbage = False
 
     def isGarbage(self) -> bool:
-        return self.isGarbage
+        return self.varIsGarbage
 
     def setGarbage(self):
-        self.isGarbage = True
+        self.varIsGarbage = True

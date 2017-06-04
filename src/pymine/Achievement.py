@@ -21,12 +21,13 @@ class Achievement:
         "diamonds": [{"name": "DIAMONDS!"}, {"requires": ["acquireIron", ]}]
     }
 
-    def broadcast(self, player: Player, achievementId):
-        if (isset(Achievement.list[achievementId])):
+    @staticmethod
+    def broadcast(player: Player, achievementId):
+        if isset(Achievement.list[achievementId]):
             translation = TranslationContainer("chat.type.achievement", [player.getDisplayName(),
                                                                          TextFormat.GREEN +
                                                                          Achievement.list[achievementId]["name"]])
-            if (Server.getInstance().getConfigString("announce-player-achievements", True) == True):
+            if Server.getInstance().getConfigString("announce-player-achievements", True) is True:
                 Server.getInstance().broadcastMessage(translation)
             else:
                 player.sendMessage(translation)
@@ -35,8 +36,11 @@ class Achievement:
 
         return False
 
-    def add(self, achievementId, achievementName, requires: array = []):
-        if (not isset(Achievement.list[achievementId])):
+    @staticmethod
+    def add(achievementId, achievementName, requires=None):
+        if requires is None:
+            requires = []
+        if not isset(Achievement.list[achievementId]):
             Achievement.list[achievementId] = [{"name": achievementName}, {"requires": requires, }]
             return True
         return False

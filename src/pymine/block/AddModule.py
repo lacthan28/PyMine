@@ -20,4 +20,4 @@ class AddModule:
         file.write(toWrite)
         file.close()
 
-    loadImports('E:/PycharmProjects/PyMine/src/pymine/block/')
+AddModule.loadImports('E:/PycharmProjects/PyMine/src/pymine/block/')

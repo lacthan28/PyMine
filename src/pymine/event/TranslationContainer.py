@@ -1,13 +1,15 @@
-from ..isset import *
-from src.pymine.event.TextContainer import *
 from array import *
+
+from ..isset import *
 
 
 class TranslationContainer:
     params = []
 
-    def __init__(self, text, params:array=[]):
+    def __init__(self, text, params=None):
         self.__init__(text)
+        if params is None:
+            params = []
         self.setParameters(params)
 
     def getParameters(self):
@@ -16,14 +18,14 @@ class TranslationContainer:
     def getParameter(self, i):
         return isset(self.params[i]) if self.params[i] else None
 
-    def setParameter(self, i, str):
+    def setParameter(self, i, string):
         if i < 0 or i > len(self.params):
-            raise ValueError("Invalid index " + i + ", have " + len(self.params))
+            raise ValueError("Invalid index " + i + ", have " + str(len(self.params)))
 
-        self.params[int(i)] = str
+        self.params[int(i)] = string
 
-    def setParameters(self, params:array):
+    def setParameters(self, params: array):
         i = 0
         for s in params:
             self.params[i] = str(s)
-            ++i
+            i = ++i
