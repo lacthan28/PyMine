@@ -1,82 +1,79 @@
-from array import *
-from json import *
 from copy import *
-
-from .ConsoleCommandSender import *
-from ..command.CommandMap import *
-from ..utils.TextFormat import *
-from ..event.TranslationContainer import *
-from ..str_replace import *
-from ..isset import *
 from .CommandSender import *
-from ..Player import *
+from .ConsoleCommandSender import *
 from ..Server import *
+from ..command.CommandMap import *
+from ..event.TranslationContainer import *
+from ..isset import *
+from ..str_replace import *
+from ..utils.TextFormat import *
 
 
 class Command:
-    """ @var
-    array """
+    """ :type list """
     defaultDataTemplate = None
 
-    """ @var
-    string """
+    """ :param name: str """
     name = None
-    """ @var    
-    array """
-    commandData = None
+    """
+    :param commandData: list
+    """
+    commandData = {}
 
-    """ @var    
+    """ :param    
     string """
     nextLabel = None
 
-    """ @var    
+    """ :param    
     string """
     label = None
 
     """
-    * @ var
+    :var
     string[]
     """
     aliases = []
 
     """
-    * @ var
+    :var
     string[]
     """
     activeAliases = []
 
-    """ @var    
+    """ :param    
     CommandMap """
     commandMap = None
 
-    """ @var    
+    """ :param    
     string """
     description = ""
 
-    """ @var    
+    """ :param    
     string """
     usageMessage = None
 
-    """ @var    
+    """ :param    
     string """
     permissionMessage = None
 
-    """ @var    
+    """ :param    
     TimingsHandler """
     timings = None
 
     """
-    * @ param
+    :param
     string   name
-    * @ param
+    :param
     string   description
-    * @ param
+    :param
     string   usageMessage
-    * @ param
+    :param
     string[] aliases
     """
 
-    def __init__(self, name, description="", usageMessage=None, aliases: array = {}):
+    def __init__(self, name, description="", usageMessage=None, aliases=None):
+        if aliases is None:
+            aliases = []
         self.commandData = self.generateDefaultData()
         self.name = self.nextLabel = self.label = name
         self.setDescription(description)
@@ -90,7 +87,7 @@ class Command:
     * @return array
     """
 
-    def getDefaultCommandData(self: array):
+    def getDefaultCommandData(self) -> list:
         return self.commandData
 
     """
@@ -110,36 +107,36 @@ class Command:
     * @return array
     """
 
-    def getOverloads(self: array):
+    def getOverloads(self) -> list:
         return self.commandData["overloads"]
 
     """
-    * @ param CommandSender sender
-    * @ param string commandLabel
-    * @ param string[] args
+    :param CommandSender sender
+    :param string commandLabel
+    :param string[] args
     *
-    * @ return mixed
+    :return mixed
     """
 
-    def execute(self, sender: CommandSender, commandLabel, args: array):
+    def execute(self, sender: CommandSender, commandLabel, args: list):
         pass
 
     """
-    * @ return string
+    :return string
     """
 
     def getName(self):
         return self.name
 
     """
-    * @ return string
+    :return string
     """
 
     def getPermission(self):
-        return isset(self.commandData["pyminePermission"]) if self.commandData["pyminePermission"] else None
+        return isset(self.commandData[int("pyminePermission")]) if self.commandData["pyminePermission"] else None
 
     """
-    * @ param
+    :param
     string | null permission
                    """
 
@@ -167,9 +164,9 @@ class Command:
         return False
 
     """
-    * @ param CommandSender target
+    :param CommandSender target
     *
-    * @ return bool
+    :return bool
     """
 
     def testPermissionSilent(self, target: CommandSender):
@@ -184,7 +181,7 @@ class Command:
         return False
 
     """
-    * @ return string
+    :return string
     """
 
     def getLabel(self):
@@ -203,9 +200,9 @@ class Command:
     """
     * Registers the command into a Command map
     *
-    * @ param CommandMap commandMap
+    :param CommandMap commandMap
     *
-    * @ return bool
+    :return bool
     """
 
     def register(self, commandMap: CommandMap):
@@ -217,9 +214,9 @@ class Command:
         return False
 
     """
-    * @ param CommandMap commandMap
+    :param CommandMap commandMap
     *
-    * @ return bool
+    :return bool
     """
 
     def unregister(self, commandMap: CommandMap):
@@ -233,61 +230,61 @@ class Command:
         return False
 
     """
-    * @ param CommandMap commandMap
+    :param CommandMap commandMap
     *
-    * @ return bool
+    :return bool
     """
 
     def allowChangesFrom(self, commandMap: CommandMap):
         return self.commandMap == None or self.commandMap == commandMap
 
     """
-    * @ return bool
+    :return bool
     """
 
     def isRegistered(self):
         return self.commandMap is not None
 
     """
-    * @ return string[]
+    :return string[]
     """
 
     def getAliases(self):
         return self.activeAliases
 
     """
-    * @ return string
+    :return string
     """
 
     def getPermissionMessage(self):
         return self.permissionMessage
 
     """
-    * @ return string
+    :return string
     """
 
     def getDescription(self):
         return self.commandData["description"]
 
     """
-    * @ return string
+    :return string
     """
 
     def getUsage(self):
         return self.usageMessage
 
     """
-    * @ param
+    :param
     string[] aliases
               """
 
-    def setAliases(self, aliases: array):
+    def setAliases(self, aliases: list):
         self.commandData["aliases"] = aliases
         if not (self.isRegistered()):
-            self.activeAliases = array(aliases)
+            self.activeAliases = aliases
 
     """
-    * @ param
+    :param
     string description
             """
 
@@ -295,7 +292,7 @@ class Command:
         self.commandData["description"] = description
 
     """
-    * @ param
+    :param
     string permissionMessage
             """
 
@@ -303,7 +300,7 @@ class Command:
         self.permissionMessage = permissionMessage
 
     """
-    * @ param
+    :param
     string usage
             """
 
@@ -311,24 +308,21 @@ class Command:
         self.usageMessage = usage
 
     """
-    * @ return array
+    :return array
     """
 
-    def generateDefaultData(self: array):
-        if (self.defaultDataTemplate is None):
+    def generateDefaultData(self) -> list:
+        if self.defaultDataTemplate is None:
             self.defaultDataTemplate = json.loads(
-                open(Server.getInstance().getFilePath() + "src/pymine/resources/command_default.json").read(), True)
+                open(Server.getInstance().getFilePath() + "src/pymine/resources/command_default.json").read())
 
         return self.defaultDataTemplate
 
     """
-    * @ param
-    CommandSender source
-                   * @ param
-    string        message
-                   * @ param
-    bool          sendToSource
-                   """
+    :param CommandSender source
+    :param string        message
+    :param bool          sendToSource
+    """
 
     def broadcastCommandMessage(self, source: CommandSender, message, sendToSource=True):
         if isinstance(message, TextContainer):
@@ -362,8 +356,8 @@ class Command:
                     user.sendMessage(colored)
 
         """
-        * @ return string
+        :return string
         """
 
-    def __toString(self):
+    def __str__(self):
         return self.name
