@@ -1,6 +1,7 @@
 from .Block import *
+from abc import *
 
 
-class Transparent(Block):
+class Transparent(metaclass=ABCMeta, Block):
     def isTransparent(self):
         return True

@@ -1,7 +1,9 @@
+# coding=utf-8
 from .permission.ServerOperator import *
+from interface import Interface, implements
 
 
-class IPlayer(ServerOperator):
+class IPlayer(implements(ServerOperator), Interface):
     # :return: bool
     def isOnline(self):
         pass

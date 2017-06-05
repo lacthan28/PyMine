@@ -1,4 +1,8 @@
-class ServerOperator(object):
+# coding=utf-8
+from zope.interface import Interface
+
+
+class ServerOperator(Interface):
     """
     Checks if the current object has operator permissions
     :return: bool

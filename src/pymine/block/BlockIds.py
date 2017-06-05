@@ -1,4 +1,8 @@
-class BlockIds:
+# coding=utf-8
+from interface import *
+
+
+class BlockIds(Interface):
     AIR = 0
     STONE = 1
     GRASS = 2

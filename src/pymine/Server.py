@@ -1,15 +1,13 @@
 # coding=utf-8
-import getopt
-import math
-import os
-import time
+from random import randint
 
-from .nbt.NBT import *
-from .nbt.tag.CompoundTag import *
+from .level.format.io.LevelProviderManager import *
+from .level.generator.Generator import *
 from .OfflinePlayer import *
 from .Player import *
 from .PyMine import *
 from .inventory.Recipe import *
+from .level.Level import *
 
 
 class Server:
@@ -846,68 +844,68 @@ class Server:
     # 
     # @return bool
     # ===========================================================================
-    def generateLevel(name, seed=null, generator=null, options=[]):
+    def generateLevel(self, name, seed=null, generator=null, options=dict()):
         if name.strip() == "" or self.isLevelGenerated(name):
             return False
 
-        seed = seed == null ? Binary.readInt(random_bytes(4)): int(seed
+        random_bytes = ''.join(randint(0, 255) for i in range(4))
+        seed = seed is None if Binary.readInt(random_bytes) else int(seed)
+        if not isset(options["preset"]):
+            options["preset"] = self.getConfigString("generator-settings", "")
 
-                                                                   if ! isset(options["preset"])):
-        options["preset"] = self.getConfigString("generator-settings", ""
+        if not generator is not None and class_exists(generator) and issubclass(generator, Generator):
+            generator = Generator.getGenerator(self.getLevelType())
 
-        if ! (generator != = null and class_exists(generator, True) and is_subclass_of(generator, Generator::class ))):
-            generator = Generator
-
-        ::getGenerator(self.getLevelType(self))
-
-        if (provider = LevelProviderManager::getProviderByName(
-            providerName=self.getProperty("level-settings.default-format", "pmanvil"))) == null):
-        provider = LevelProviderManager::getProviderByName(providerName="pmanvil")
+        if LevelProviderManager.getProviderByName(
+                providerName=self.getProperty("level-settings.default-format", "pmanvil")) is None:
+            provider = LevelProviderManager.getProviderByName(providerName="pmanvil")
 
         try:
             path = self.getDataPath(self) + "worlds/" + name + "/"
-        # =========================================================================== @var \pymine\level\format\io\LevelProvider provider #===========================================================================
-        provider::generate(path, name, seed, generator, options)
+            # ===========================================================================
+            # @var \pymine\level\format\io\LevelProvider provider
+            # #===========================================================================
+            provider.generate(path, name, seed, generator, options)
 
-        level = Level(this, name, path, provider)
-        self.levels[level.getId(self)] = level
+            level = Level(self, name, path, provider)
+            self.levels[level.getId()] = level
 
-        level.initLevel(self)
+            level.initLevel(self)
 
-        level.setTickRate(self.baseTickRate)
+            level.setTickRate(self.baseTickRate)
 
-    except:
-    self.logger.error(self.getLanguage(self).translateString("pymine.level.generateError", [name, e.getMessage(self)]))
-    self.logger.logException(e)
-    return False
+        except BaseException as e:
+            self.logger.error(
+                self.getLanguage(self).translateString("pymine.level.generateError", [name, e.getMessage(self)]))
+            self.logger.logException(e)
+            return False
 
+        self.getPluginManager(self).callEvent(LevelInitEvent(level))
 
-self.getPluginManager(self).callEvent(LevelInitEvent(level))
+        self.getPluginManager(self).callEvent(LevelLoadEvent(level))
 
-self.getPluginManager(self).callEvent(LevelLoadEvent(level))
+        self.getLogger(self).notice(self.getLanguage(self).translateString("pymine.level.backgroundGeneration", [name]))
 
-self.getLogger(self).notice(self.getLanguage(self).translateString("pymine.level.backgroundGeneration", [name]))
+        centerX = level.getSpawnLocation(self).getX(self) >> 4
+        centerZ = level.getSpawnLocation(self).getZ(self) >> 4
 
-centerX = level.getSpawnLocation(self).getX(self) >> 4
-centerZ = level.getSpawnLocation(self).getZ(self) >> 4
+        order = []
 
-order = []
+        for (X=-3 X <= 3 + +X):
+            for (Z=-3 Z <= 3 + +Z):
+                distance = X *  # 2 + Z *# 2
+                chunkX = X + centerX
+                chunkZ = Z + centerZ
+                index = Level::chunkHash(chunkX, chunkZ)
+                order[index] = distance
 
-for (X=-3 X <= 3 + +X):
-    for (Z=-3 Z <= 3 + +Z):
-        distance = X *  # 2 + Z *# 2
-        chunkX = X + centerX
-        chunkZ = Z + centerZ
-        index = Level::chunkHash(chunkX, chunkZ)
-        order[index] = distance
+        asort(order)
 
-asort(order)
+        foreach(order as index = > distance):
+        Level::getXZ(index, chunkX, chunkZ)
+        level.populateChunk(chunkX, chunkZ, True)
 
-foreach(order as index = > distance):
-Level::getXZ(index, chunkX, chunkZ)
-level.populateChunk(chunkX, chunkZ, True)
-
-return True
+        return True
 
 
 # ===========================================================================
@@ -920,7 +918,7 @@ def isLevelGenerated(name):
         return False
 
     path = self.getDataPath(self) + "worlds/" + name + "/"
-    if ! (self.getLevelByName(name) instanceof Level)):
+    if not (self.getLevelByName(name) instanceof Level)):
 
         if
     LevelProviderManager::getProvider(path) == null):
@@ -944,7 +942,7 @@ def findEntity(int entityId, Level
 
 expectedLevel = null):
 levels = self.levels
-if expectedLevel != = null):
+if expectedLevel is not None):
     array_unshift(levels, expectedLevel)
 
 foreach(levels as level):
@@ -977,8 +975,8 @@ return self.properties.exists(variable) ? self.properties.get(variable): default
 #
 # @return mixed
 # ===========================================================================
-def getProperty(variable, defaultValue=null):
-    if ! array_key_exists(variable, self.propertyCache)):
+def getProperty(self, variable, defaultValue=null):
+    if not array_key_exists(variable, self.propertyCache)):
         v = getopt("", ["variable::"])
         if isset(v[variable])):
     self.propertyCache[variable] = v[variable]
@@ -1015,21 +1013,22 @@ def getConfigInt(self, variable, defaultValue=0):
     # @param int    value
     # ===========================================================================
 
+    def setConfigInt(variable, value):
 
-def setConfigInt(variable, value):
-    self.properties.set(variable, int(value)
-
-
-    # ===========================================================================
-    # @param string  variable
-    # @param boolean defaultValue
-    # 
-    # @return boolean
-    # ===========================================================================
+        self.properties.set(variable, int(value)
 
 
-def getConfigBoolean(variable, defaultValue=False):
-    v = getopt("", ["variable::"])
+        # ===========================================================================
+        # @param string  variable
+        # @param boolean defaultValue
+        #
+        # @return boolean
+        # ===========================================================================
+
+    def getConfigBoolean(variable, defaultValue=False):
+
+        v = getopt("", ["variable::"])
+
     if isset(v[variable])):
         value = v[variable]
     else:
@@ -1059,7 +1058,7 @@ def setConfigBool(variable, value):
 
     # ===========================================================================
     # @param string name
-    # 
+    #
     # @return PluginIdentifiableCommand
     # ===========================================================================
     def getPluginCommand(name):
@@ -1100,11 +1099,11 @@ def addOp(name):
     # @param string name
     # ===========================================================================
 
+    def removeOp(name):
 
-def removeOp(name):
-    self.operators.remove(strtolower(name))
+        self.operators.remove(strtolower(name))
 
-    if (player=self.getPlayerExact(name)) != = null):
+    if (player=self.getPlayerExact(name)) is not None):
         player.recalculatePermissions(self)
 
     self.operators.save(self)
@@ -1114,9 +1113,10 @@ def removeOp(name):
     # @param string name
     # ===========================================================================
 
+    def addWhitelist(name):
 
-def addWhitelist(name):
-    self.whitelist.set(strtolower(name), True)
+        self.whitelist.set(strtolower(name), True)
+
     self.whitelist.save(True)
 
 
@@ -1134,7 +1134,7 @@ def removeWhitelist(name):
 # @return bool
 # ===========================================================================
 def isWhitelisted(name):
-    return ! self.hasWhitelist(self) or self.operators.exists(name, True) or self.whitelist.exists(name, True)
+    return not self.hasWhitelist(self) or self.operators.exists(name, True) or self.whitelist.exists(name, True)
 
 
 # ===========================================================================
@@ -1186,8 +1186,8 @@ def getCommandAliases(self):
 # ===========================================================================
 # @return Server
 # ===========================================================================
-    def getInstance(self) -> Server:
-        return self.instance
+def getInstance(self) -> Server:
+    return self.instance
 
 
 def microSleep(int microseconds
@@ -1206,7 +1206,7 @@ Server::sleeper.wait(ms)
 # @param string          dataPath
 # @param string          pluginPath
 # ===========================================================================
-def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, filePath, dataPath, pluginPath):
+def __construct(\ClassLoader autoloader,                    \ThreadedLogger logger, filePath, dataPath, pluginPath):
     self::instance = this
     self::sleeper = \Threaded
     self.autoloader = autoloader
@@ -1215,13 +1215,13 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
     try:
 
         self.filePath = filePath
-        if ! file_exists(dataPath + "worlds/")):
+        if not file_exists(dataPath + "worlds/")):
             mkdir(dataPath + "worlds/", 0777)
 
-            if ! file_exists(dataPath + "players/")):
+            if not file_exists(dataPath + "players/")):
         mkdir(dataPath + "players/", 0777)
 
-        if ! file_exists(pluginPath)):
+        if not file_exists(pluginPath)):
         mkdir(pluginPath, 0777)
 
         self.dataPath = realpath(dataPath) + DIRECTORY_SEPARATOR
@@ -1232,7 +1232,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
         version = VersionString(self.getpymineVersion(self))
 
         self.logger.info("Loading pymine.yml...")
-        if ! file_exists(self.dataPath + "pymine.yml")):
+        if not file_exists(self.dataPath + "pymine.yml")):
         content = file_get_contents(self.filePath + "src/pymine/resources/pymine.yml")
         if version.isDev(self)):
         content = str_replace("preferred-channel: stable", "preferred-channel: beta", content)
@@ -1311,7 +1311,8 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
 
         if self.getConfigBoolean("enable-rcon", False) == True):
         self.rcon = RCON(this,
-                         self.getConfigString("rcon.password", "", self.getConfigInt("rcon.port", self.getPort(self)),
+                         self.getConfigString("rcon.password", "",
+                                              self.getConfigInt("rcon.port", self.getPort(self)),
                                               (ip = self.getIp(self)) != "" ? ip: "0.0.0.0", self.getConfigInt(
             "rcon.threads", 1), self.getConfigInt("rcon.clients-per-thread", 50))
 
@@ -1322,7 +1323,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
 
         self.operators = Config(self.dataPath + "ops.txt", Config::ENUM)
         self.whitelist = Config(self.dataPath + "white-list.txt", Config::ENUM)
-        if file_exists(self.dataPath + "banned.txt") and ! file_exists(self.dataPath + "banned-players.txt")):
+        if file_exists(self.dataPath + "banned.txt") and not file_exists(self.dataPath + "banned-players.txt")):
             @
         rename(self.dataPath + "banned.txt", self.dataPath + "banned-players.txt")
 
@@ -1353,7 +1354,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
             self.logger.setLogDebug(\pymine\DEBUG > 1)
 
 
-        if              \pymine\DEBUG >= 0):
+        if                    \pymine\DEBUG >= 0):
             @
         cli_set_process_title(self.getName(self) + " " + self.getpymineVersion(self))
 
@@ -1474,7 +1475,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
 
         if self.loadLevel(default) == False):
         seed = getopt("", ["level-seed::"])["level-seed"] ?? self.properties.get("level-seed", time(self))
-        if ! is_numeric(seed) or bccomp(seed, "9223372036854775807") > 0):
+        if not is_numeric(seed) or bccomp(seed, "9223372036854775807") > 0):
         seed = Utils::javaStringHash(seed)
         elif PHP_INT_SIZE == 8):
         seed = int(seed
@@ -1486,7 +1487,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
 
         self.properties.save(True)
 
-        if ! (self.getDefaultLevel(self)
+        if not (self.getDefaultLevel(self)
         instanceof
         Level)):
         self.getLogger(self).emergency(self.getLanguage(self).translateString("pymine.level.defaultError"))
@@ -1513,7 +1514,7 @@ def __construct(\ClassLoader autoloader,              \ThreadedLogger logger, fi
 
 
 def broadcastMessage(message, recipients=null):
-    if ! is_array(recipients)):
+    if not is_array(recipients)):
         return self.broadcast(message, self::BROADCAST_CHANNEL_USERS)
 
 
@@ -1532,7 +1533,7 @@ return count(recipients)
 # @return int
 # ===========================================================================
 def broadcastTip(tip, recipients=null):
-    if ! is_array(recipients)):
+    if not is_array(recipients)):
     # =========================================================================== @var Player[] recipients #===========================================================================
         recipients = []
 
@@ -1551,8 +1552,7 @@ def broadcastTip(tip, recipients=null):
     foreach(recipients as recipient):
     recipient.sendTip(tip)
 
-
-return count(recipients)  # ===========================================================================
+    return count(recipients)  # ===========================================================================
 
 
 # @param string        popup
@@ -1561,7 +1561,7 @@ return count(recipients)  # ====================================================
 # @return int
 # ===========================================================================
 def broadcastPopup(popup, recipients=null):
-    if ! is_array(recipients)):
+    if not is_array(recipients)):
     # =========================================================================== @var Player[] recipients #===========================================================================
         recipients = []
 
@@ -1580,8 +1580,7 @@ def broadcastPopup(popup, recipients=null):
     foreach(recipients as recipient):
     recipient.sendPopup(popup)
 
-
-return count(recipients)  # ===========================================================================
+    return count(recipients)  # ===========================================================================
 
 
 # @param string message
@@ -1611,7 +1610,7 @@ def broadcast(message, permissions):
 
     # ===========================================================================
     # Broadcasts a Minecraft packet to a list of players
-    # 
+    #
     # @param Player[]   players
     # @param DataPacket packet
 
@@ -1638,7 +1637,7 @@ if isset(packet.__encapsulatedPacket)):
 
     # ===========================================================================
     # Broadcasts a list of packets in a batch to a list of players
-    # 
+    #
     # @param Player[]            players
     # @param DataPacket[]|string packets
     # @param bool                forceSync
@@ -1654,7 +1653,8 @@ str = ""
 
 foreach(packets as p):
 if p instanceof DataPacket):
-    if ! p.isEncoded):
+    if
+not p.isEncoded):
 p.encode(self)
 
 str + = Binary::writeUnsignedVarInt(strlen(p.buffer)) + p.buffer
@@ -1666,7 +1666,7 @@ foreach(players as p):
 if p.isConnected(self)):
     targets[] = self.identifiers[spl_object_hash(p)]
 
-    if ! forceSync and self.networkCompressionAsync):
+    if not forceSync and self.networkCompressionAsync):
 task = CompressBatchedTask(str, targets, self.networkCompressionLevel)
 self.getScheduler(self).scheduleAsyncTask(task)
 else:
@@ -1698,7 +1698,7 @@ if isset(self.players[i])):
 
 def enablePlugins(type):
     foreach(self.pluginManager.getPlugins(self) as plugin):
-    if ! plugin.isEnabled(self) and plugin.getDescription(self).getOrder(self) == type):
+    if not plugin.isEnabled(self) and plugin.getDescription(self).getOrder(self) == type):
         self.enablePlugin(plugin)
 
     if type == PluginLoadOrder: :
@@ -1712,667 +1712,644 @@ def enablePlugins(type):
     # @param Plugin plugin
     # ===========================================================================
 
+    def enablePlugin(Plugin plugin
 
-def enablePlugin(Plugin plugin
+    ):
+    self.pluginManager.enablePlugin(plugin)
 
-):
-self.pluginManager.enablePlugin(plugin)
-
-
-def disablePlugins(self):
-    self.pluginManager.disablePlugins(self)
-
-
-def checkConsole(self):
-    Timings.serverCommandTimer.startTiming(self)
-    line = self.console.getLine(self)
-    if line is not None:
-        self.pluginManager.callEvent(ev=ServerCommandEvent(self.consoleSender, line))
-        if not ev.isCancelled(self):
-            self.dispatchCommand(ev.getSender(self), ev.getCommand(self))
-
-    Timings.serverCommandTimer.stopTiming(self)
-
-
-# ===========================================================================
-# Executes a command from a CommandSender
-#
-# @param CommandSender sender
-# @param string        commandLine
-#
-# @return bool
-# ===========================================================================
-def dispatchCommand(CommandSender sender, commandLine
-
-):
-if self.commandMap.dispatch(sender, commandLine)):
-    return True
-
-sender.sendMessage(TranslationContainer(TextFormat::GOLD + "%commands.generic.notFound"))
-
-return False
-
-
-def reload(self):
-    self.logger.info("Saving levels...")
-
-    foreach(self.levels as level):
-    level.save(self)
-
-
-self.pluginManager.disablePlugins(self)
-self.pluginManager.clearPlugins(self)
-self.commandMap.clearCommands(self)
-
-self.logger.info("Reloading properties...")
-self.properties.reload(self)
-self.maxPlayers = self.getConfigInt("max-players", 20)
-
-if self.getConfigBoolean("hardcore", False) == True and self.getDifficulty(self) < 3):
-    self.setConfigInt("difficulty", 3)
-
-self.banByIP.load(self)
-self.banByName.load(self)
-self.reloadWhitelist(self)
-self.operators.reload(self)
-
-foreach(self.getIPBans(self).getEntries(self) as entry):
-self.getNetwork(self).blockAddress(entry.getName(self), -1)
-
-self.pluginManager.registerInterface(PharPluginLoader::class )
-self.pluginManager.registerInterface(ScriptPluginLoader::
-
-
-class )
-self.pluginManager.loadPlugins(self.pluginPath)
-self.enablePlugins(PluginLoadOrder::
-
-
-STARTUP)
-self.enablePlugins(PluginLoadOrder::POSTWORLD)
-TimingsHandler::reload(self)
-
-
-# ===========================================================================
-# Shutdowns the server correctly
-# ===========================================================================
-
-
-def shutdown(self):
-    self.isRunning = False
-
-
-def forceShutdown(self):
-    if self.hasStopped):
-        return
-
-    try:
-        if ! self.isRunning(self)):
-            self.sendUsage(SendUsageTask::TYPE_CLOSE)
-
-
-        self.hasStopped = True
-
-        self.shutdown(self)
-        if self.rcon
-        instanceof
-        RCON):
-        self.rcon.stop(self)
-
-        if self.getProperty("network.upnp-forwarding", False) == True):
-        self.logger.info("[UPnP] Removing port forward...")
-        UPnP::RemovePortForward(self.getPort(self))
-
-        if self.pluginManager
-        instanceof
-        PluginManager):
-        self.getLogger(self).debug("Disabling all plugins")
+    def disablePlugins(self):
         self.pluginManager.disablePlugins(self)
 
-        foreach(self.players as player):
-        player.close(player.getLeaveMessage(self), self.getProperty("settings.shutdown-message", "Server closed"))
+    def checkConsole(self):
+        Timings.serverCommandTimer.startTiming(self)
+        line = self.console.getLine(self)
+        if line is not None:
+            self.pluginManager.callEvent(ev=ServerCommandEvent(self.consoleSender, line))
+            if not ev.isCancelled(self):
+                self.dispatchCommand(ev.getSender(self), ev.getCommand(self))
 
-        self.getLogger(self).debug("Unloading all levels")
-        foreach(self.getLevels(self) as level):
-        self.unloadLevel(level, True)
+        Timings.serverCommandTimer.stopTiming(self)
 
-        self.getLogger(self).debug("Removing event handlers")
-        HandlerList::unregisterAll(self)
+    # ===========================================================================
+    # Executes a command from a CommandSender
+    #
+    # @param CommandSender sender
+    # @param string        commandLine
+    #
+    # @return bool
+    # ===========================================================================
+    def dispatchCommand(CommandSender sender, commandLine
 
-        self.getLogger(self).debug("Stopping all tasks")
-        self.scheduler.cancelAllTasks(self)
-        self.scheduler.mainThreadHeartbeat(PHP_INT_MAX)
+    ):
+    if self.commandMap.dispatch(sender, commandLine)):
+        return True
 
-        self.getLogger(self).debug("Saving properties")
-        self.properties.save(self)
+    sender.sendMessage(TranslationContainer(TextFormat::GOLD + "%commands.generic.notFound"))
 
-        self.getLogger(self).debug("Closing console")
-        self.console.shutdown(self)
-        self.console.notify(self)
+    return False
 
-        self.getLogger(self).debug("Stopping network interfaces")
-        foreach(self.network.getInterfaces(self) as interface):
-        interface.shutdown(self)
-        self.network.unregisterInterface(interface)
+    def reload(self):
+        self.logger.info("Saving levels...")
 
-        gc_collect_cycles(self)
-    except:
-        self.logger.logException(e)
-        self.logger.emergency("Crashed while crashing, killing process")
+        foreach(self.levels as level):
+        level.save(self)
 
-        @kill(getmypid(self))
+    self.pluginManager.disablePlugins(self)
+    self.pluginManager.clearPlugins(self)
+    self.commandMap.clearCommands(self)
 
+    self.logger.info("Reloading properties...")
+    self.properties.reload(self)
+    self.maxPlayers = self.getConfigInt("max-players", 20)
 
-def getQueryInformation(self):
-    return self.queryRegenerateTask
+    if self.getConfigBoolean("hardcore", False) == True and self.getDifficulty(self) < 3):
+        self.setConfigInt("difficulty", 3)
 
-
-# ===========================================================================
-# Starts the PyMine server and starts processing ticks and packets
-# ===========================================================================
-def start(self):
-    if self.getConfigBoolean("enable-query", True) == True):
-        self.queryHandler = QueryHandler(self)
+    self.banByIP.load(self)
+    self.banByName.load(self)
+    self.reloadWhitelist(self)
+    self.operators.reload(self)
 
     foreach(self.getIPBans(self).getEntries(self) as entry):
-    self.network.blockAddress(entry.getName(self), -1)
+    self.getNetwork(self).blockAddress(entry.getName(self), -1)
 
-    if self.getProperty("settings.send-usage", True)):
-    self.sendUsageTicker = 6000
-    self.sendUsage(SendUsageTask::TYPE_OPEN)
+    self.pluginManager.registerInterface(PharPluginLoader::class )
+    self.pluginManager.registerInterface(ScriptPluginLoader::
 
+    class )
+    self.pluginManager.loadPlugins(self.pluginPath)
+    self.enablePlugins(PluginLoadOrder::
 
-
-    if self.getProperty("network.upnp-forwarding", False) == True):
-        self.logger.info("[UPnP] Trying to port forward...")
-    UPnP::PortForward(self.getPort(self))
-
-    self.tickCounter = 0
-
-    if function_exists("pcntl_signal")):
-    pcntl_signal(SIGTERM, [this, "handleSignal"])
-    pcntl_signal(SIGINT, [this, "handleSignal"])
-    pcntl_signal(SIGHUP, [this, "handleSignal"])
-    self.dispatchSignals = True
-
-    self.logger.info(self.getLanguage(self).translateString("pymine.server.defaultGameMode", [self::getGamemodeString(
-    self.getGamemode(self))]))
-
-    self.logger.info(self.getLanguage(self).translateString("pymine.server.startFinished",
-                                                            [round(microtime(True) - \pymine\START_TIME, 3)]))
-
-    self.tickProcessor(self)
-    self.forceShutdown(self)
+    STARTUP)
+    self.enablePlugins(PluginLoadOrder::POSTWORLD)
+    TimingsHandler::reload(self)
 
 
-def handleSignal(signo):
-    if signo == SIGTERM or signo == SIGINT or signo == SIGHUP):
-        self.shutdown(self)
+    # ===========================================================================
+    # Shutdowns the server correctly
+    # ===========================================================================
 
+    def shutdown(self):
+        self.isRunning = False
 
-def exceptionHandler(\Throwable e, trace=null):
-    if e == null):
-        return
+    def forceShutdown(self):
+        if self.hasStopped):
+            return
 
-
-global lastError
-
-if trace == null):
-    trace = e.getTrace(self)
-
-errstr = e.getMessage(self)
-errfile = e.getFile(self)
-errno = e.getCode(self)
-errline = e.getLine(self)
-
-type = (errno == E_ERROR or errno == E_USER_ERROR) ? \LogLevel::ERROR: (
-(errno == E_USER_WARNING or errno == E_WARNING) ? \LogLevel::WARNING: \LogLevel::NOTICE)
-
-errstr = preg_replace('/\s+/', ' ', trim(errstr))
-
-errfile = cleanPath(errfile)
-
-self.logger.logException(e, trace)
-
-lastError = [
-"type" = > type,
-"message" = > errstr,
-"fullFile" = > e.getFile(self),
-"file" = > errfile,
-"line" = > errline,
-"trace" = > getTrace(0, trace)
-
-]
-
-global lastExceptionError, lastError
-lastExceptionError = lastError
-self.crashDump(self)
-
-
-def crashDump(self):
-    if self.isRunning == False):
-        return
-
-
-if self.sendUsageTicker > 0):
-    self.sendUsage(SendUsageTask::TYPE_CLOSE)
-
-self.hasStopped = False
-
-ini_set("error_reporting", 0)
-ini_set("memory_limit", -1) // Fix
-error
-dump
-not dumped
-on
-memory
-problems
-self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.create"))
-try:
-    dump = CrashDump(this)
-except:
-    self.logger.logException(e)
-    self.logger.critical(self.getLanguage(self).translateString("pymine.crash.error", [e.getMessage(self)]))
-    return
-
-self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.submit", [dump.getPath(self)]))
-
-if self.getProperty("auto-report.enabled", True) != = False):
-    report = True
-plugin = dump.getData(self)["plugin"]
-if is_string(plugin)):
-p = self.pluginManager.getPlugin(plugin)
-if p
-instanceof
-Plugin and ! (p.getPluginLoader(self)
-instanceof
-PharPluginLoader)):
-report = False
-
-elif              \Phar::running(True) == "":
-report = False
-
-if dump.getData(self)["error"]["type"] == "E_PARSE" or dump.getData(self)["error"]["type"] == "E_COMPILE_ERROR"):
-report = False
-
-if report):
-reply = Utils::postURL("http://" + self.getProperty("auto-report.host", "crash.pymine.net") + "/submit/api", [
-    "report" = > "yes",
-                 "name" = > self.getName(self) + " " + self.getpymineVersion(self),
-                            "email" = > "crash@pymine.net",
-                                        "reportPaste" = > base64_encode(dump.getEncodedData(self))
-])
-
-if (data=json_decode(reply)) != = False and isset(data.crashId)):
-    reportId = data.crashId
-reportUrl = data.crashUrl
-self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.archive", [reportUrl, reportId]))
-
-// self.checkMemory(self)
-// dump + = "Memory Usage Tracking: \r\n" + chunk_split(
-    base64_encode(gzdeflate(implode("", self.memoryStats), 9))) + "\r\n"
-
-self.forceShutdown(self)
-self.isRunning = False
-                 @ kill(getmypid(self))
-exit(1)
-
-
-def __debugInfo(self):
-    return []
-
-
-private
-function
-tickProcessor(self):
-self.nextTick = microtime(True)
-while (self.isRunning):
-    self.tick(self)
-    next = self.nextTick - 0.0001
-    if next > microtime(True)):
         try:
-            @time_sleep_until(next)
-        except:
-            // Sometimes
-            next is less
-            than
-            the
-            current
-            time.High
-            load?
+            if not self.isRunning(self)):
+                self.sendUsage(SendUsageTask::TYPE_CLOSE)
 
 
-            def onPlayerLogin(Player player
+            self.hasStopped = True
 
-            ):
-            if self.sendUsageTicker > 0):
-                self.uniquePlayers[player.getRawUniqueId(self)] = player.getRawUniqueId(self)
+            self.shutdown(self)
+            if self.rcon
+            instanceof
+            RCON):
+            self.rcon.stop(self)
 
-            self.sendFullPlayerListData(player)
-            player.dataPacket(self.craftingManager.getCraftingDataPacket(self))
+            if self.getProperty("network.upnp-forwarding", False) == True):
+            self.logger.info("[UPnP] Removing port forward...")
+            UPnP::RemovePortForward(self.getPort(self))
 
+            if self.pluginManager
+            instanceof
+            PluginManager):
+            self.getLogger(self).debug("Disabling all plugins")
+            self.pluginManager.disablePlugins(self)
 
-            def addPlayer(identifier, Player player
+            foreach(self.players as player):
+            player.close(player.getLeaveMessage(self),
+                         self.getProperty("settings.shutdown-message", "Server closed"))
 
-            ):
-            self.players[identifier] = player
-            self.identifiers[spl_object_hash(player)] = identifier
-
-
-            def addOnlinePlayer(Player player
-
-            ):
-            self.playerList[player.getRawUniqueId(self)] = player
-
-            self.updatePlayerListData(player.getUniqueId(self), player.getId(self), player.getDisplayName(self),
-                                      player.getSkinId(self), player.getSkinData(self))
-
-
-            def removeOnlinePlayer(Player player
-
-            ):
-            if isset(self.playerList[player.getRawUniqueId(self)])):
-                unset(self.playerList[player.getRawUniqueId(self)])
-
-            pk = PlayerListPacket(self)
-            pk.type = PlayerListPacket::TYPE_REMOVE
-            pk.entries[] = [player.getUniqueId(self)]
-            self.broadcastPacket(self.playerList, pk)
-
-
-            def updatePlayerListData(UUID uuid, entityId, name, skinId, skinData, array
-
-
-            players = null):
-            pk = PlayerListPacket(self)
-            pk.type = PlayerListPacket::TYPE_ADD
-            pk.entries[] = [uuid, entityId, name, skinId, skinData]
-            self.broadcastPacket(players == null ? self.playerList: players, pk)
-
-
-            def removePlayerListData(UUID uuid, array
-
-
-            players = null):
-            pk = PlayerListPacket(self)
-            pk.type = PlayerListPacket::TYPE_REMOVE
-            pk.entries[] = [uuid]
-            self.broadcastPacket(players == null ? self.playerList: players, pk)
-
-
-            def sendFullPlayerListData(Player p
-
-            ):
-            pk = PlayerListPacket(self)
-            pk.type = PlayerListPacket::TYPE_ADD
-            foreach(self.playerList as player):
-            pk.entries[] = [player.getUniqueId(self), player.getId(self), player.getDisplayName(self),
-                            player.getSkinId(self),
-                            player.getSkinData(self)]
-
-            p.dataPacket(pk)
-
-            private
-            function
-            checkTickUpdates(currentTick, tickTime):
-            foreach(self.players as p):
-            if ! p.loggedIn and (tickTime - p.creationTime) >= 10):
-                p.close("", "Login timeout")
-            elif self.alwaysTickPlayers and p.joined):
-                p.onUpdate(currentTick)
-
-                // Do
-            level
-            ticks
+            self.getLogger(self).debug("Unloading all levels")
             foreach(self.getLevels(self) as level):
-            if level.getTickRate(self) > self.baseTickRate and - -level.tickRateCounter > 0):
-                continue
+            self.unloadLevel(level, True)
 
+            self.getLogger(self).debug("Removing event handlers")
+            HandlerList::unregisterAll(self)
+
+            self.getLogger(self).debug("Stopping all tasks")
+            self.scheduler.cancelAllTasks(self)
+            self.scheduler.mainThreadHeartbeat(PHP_INT_MAX)
+
+            self.getLogger(self).debug("Saving properties")
+            self.properties.save(self)
+
+            self.getLogger(self).debug("Closing console")
+            self.console.shutdown(self)
+            self.console.notify(self)
+
+            self.getLogger(self).debug("Stopping network interfaces")
+            foreach(self.network.getInterfaces(self) as interface):
+            interface.shutdown(self)
+            self.network.unregisterInterface(interface)
+
+            gc_collect_cycles(self)
+        except:
+            self.logger.logException(e)
+            self.logger.emergency("Crashed while crashing, killing process")
+
+            @kill(getmypid(self))
+
+    def getQueryInformation(self):
+        return self.queryRegenerateTask
+
+    # ===========================================================================
+    # Starts the PyMine server and starts processing ticks and packets
+    # ===========================================================================
+    def start(self):
+        if self.getConfigBoolean("enable-query", True) == True):
+            self.queryHandler = QueryHandler(self)
+
+        foreach(self.getIPBans(self).getEntries(self) as entry):
+        self.network.blockAddress(entry.getName(self), -1)
+
+        if self.getProperty("settings.send-usage", True)):
+        self.sendUsageTicker = 6000
+        self.sendUsage(SendUsageTask::TYPE_OPEN)
+
+
+
+        if self.getProperty("network.upnp-forwarding", False) == True):
+            self.logger.info("[UPnP] Trying to port forward...")
+        UPnP::PortForward(self.getPort(self))
+
+        self.tickCounter = 0
+
+        if function_exists("pcntl_signal")):
+        pcntl_signal(SIGTERM, [this, "handleSignal"])
+        pcntl_signal(SIGINT, [this, "handleSignal"])
+        pcntl_signal(SIGHUP, [this, "handleSignal"])
+        self.dispatchSignals = True
+
+        self.logger.info(
+            self.getLanguage(self).translateString("pymine.server.defaultGameMode", [self::getGamemodeString(
+        self.getGamemode(self))]))
+
+        self.logger.info(self.getLanguage(self).translateString("pymine.server.startFinished",
+                                                                [round(microtime(True) - \pymine\START_TIME, 3)]))
+
+        self.tickProcessor(self)
+        self.forceShutdown(self)
+
+        def handleSignal(signo):
+
+            if signo == SIGTERM or signo == SIGINT or signo == SIGHUP):
+                self.shutdown(self)
+
+        def exceptionHandler(\Throwable e, trace=null):
+
+            if e == null):
+                return
+
+    global lastError
+
+    if trace == null):
+        trace = e.getTrace(self)
+
+    errstr = e.getMessage(self)
+    errfile = e.getFile(self)
+    errno = e.getCode(self)
+    errline = e.getLine(self)
+
+    type = (errno == E_ERROR or errno == E_USER_ERROR) ? \LogLevel::ERROR: (
+    (errno == E_USER_WARNING or errno == E_WARNING) ? \LogLevel::WARNING: \LogLevel::NOTICE)
+
+    errstr = preg_replace('/\s+/', ' ', trim(errstr))
+
+    errfile = cleanPath(errfile)
+
+    self.logger.logException(e, trace)
+
+    lastError = [
+    "type" = > type,
+    "message" = > errstr,
+    "fullFile" = > e.getFile(self),
+    "file" = > errfile,
+    "line" = > errline,
+    "trace" = > getTrace(0, trace)
+
+    ]
+
+    global lastExceptionError, lastError
+    lastExceptionError = lastError
+    self.crashDump(self)
+
+    def crashDump(self):
+        if self.isRunning == False):
+            return
+
+    if self.sendUsageTicker > 0):
+        self.sendUsage(SendUsageTask::TYPE_CLOSE)
+
+    self.hasStopped = False
+
+    ini_set("error_reporting", 0)
+    ini_set("memory_limit", -1) // Fix
+    error
+    dump
+    not dumped
+    on
+    memory
+    problems
+    self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.create"))
+    try:
+        dump = CrashDump(this)
+    except:
+        self.logger.logException(e)
+        self.logger.critical(self.getLanguage(self).translateString("pymine.crash.error", [e.getMessage(self)]))
+        return
+
+    self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.submit", [dump.getPath(self)]))
+
+    if self.getProperty("auto-report.enabled", True) is not False):
+        report = True
+    plugin = dump.getData(self)["plugin"]
+    if is_string(plugin)):
+    p = self.pluginManager.getPlugin(plugin)
+    if p
+    instanceof
+    Plugin and not (p.getPluginLoader(self)
+    instanceof
+    PharPluginLoader)):
+    report = False
+
+    elif                    \Phar::running(True) == "":
+    report = False
+
+    if dump.getData(self)["error"]["type"] == "E_PARSE" or dump.getData(self)["error"][
+                                                               "type"] == "E_COMPILE_ERROR"):
+    report = False
+
+    if report):
+    reply = Utils::postURL("http://" + self.getProperty("auto-report.host", "crash.pymine.net") + "/submit/api", [
+        "report" = > "yes",
+                     "name" = > self.getName(self) + " " + self.getpymineVersion(self),
+                                "email" = > "crash@pymine.net",
+                                            "reportPaste" = > base64_encode(dump.getEncodedData(self))
+    ])
+
+    if (data=json_decode(reply)) is not False and isset(data.crashId)):
+        reportId = data.crashId
+    reportUrl = data.crashUrl
+    self.logger.emergency(self.getLanguage(self).translateString("pymine.crash.archive", [reportUrl, reportId]))
+
+    // self.checkMemory(self)
+    // dump + = "Memory Usage Tracking: \r\n" + chunk_split(
+        base64_encode(gzdeflate(implode("", self.memoryStats), 9))) + "\r\n"
+
+    self.forceShutdown(self)
+    self.isRunning = False
+                     @ kill(getmypid(self))
+    exit(1)
+
+    def __debugInfo(self):
+        return []
+
+    private
+    function
+    tickProcessor(self):
+    self.nextTick = microtime(True)
+    while (self.isRunning):
+        self.tick(self)
+        next = self.nextTick - 0.0001
+        if next > microtime(True)):
             try:
-                levelTime = microtime(True)
-                level.doTick(currentTick)
-                tickMs = (microtime(True) - levelTime)  # 1000
-                level.tickRateTime = tickMs
-
-                if self.autoTickRate):
-                    if
-                tickMs < 50 and level.getTickRate(self) > self.baseTickRate):
-                level.setTickRate(r=level.getTickRate(self) - 1)
-                if r > self.baseTickRate):
-                level.tickRateCounter = level.getTickRate(self)
-
-                self.getLogger(self).debug(
-                    "Raising level \":level->getName(self)\" tick rate to :level->getTickRate(self) ticks")
-                elif tickMs >= 50):
-                if level.getTickRate(self) == self.baseTickRate):
-                    level.setTickRate(max(self.baseTickRate + 1, min(self.autoTickRateLimit, floor(tickMs / 50))))
-                self.getLogger(self).debug(
-                    sprintf("Level \"%s\" took %gms, setting tick rate to %d ticks", level.getName(self),
-                            round(tickMs, 2),
-                            level.getTickRate(self)))
-                elif (tickMs / level.getTickRate(self)) >= 50 and level.getTickRate(self) < self.autoTickRateLimit):
-                level.setTickRate(level.getTickRate(self) + 1)
-                self.getLogger(self).debug(
-                    sprintf("Level \"%s\" took %gms, setting tick rate to %d ticks", level.getName(self),
-                            round(tickMs, 2),
-                            level.getTickRate(self)))
-
-                level.tickRateCounter = level.getTickRate(self)
+                @time_sleep_until(next)
+            except:
+                // Sometimes
+                next is less
+                than
+                the
+                current
+                time.High
+                load?
 
 
-                except:
-                self.logger.critical(
-                    self.getLanguage(self).translateString("pymine.level.tickError",
-                                                           [level.getName(self), e.getMessage(self)]))
-                self.logger.logException(e)
+                def onPlayerLogin(Player player
+
+                ):
+                if self.sendUsageTicker > 0):
+                    self.uniquePlayers[player.getRawUniqueId(self)] = player.getRawUniqueId(self)
+
+                self.sendFullPlayerListData(player)
+                player.dataPacket(self.craftingManager.getCraftingDataPacket(self))
+
+                def addPlayer(identifier, Player player
+
+                ):
+                self.players[identifier] = player
+                self.identifiers[spl_object_hash(player)] = identifier
+
+                def addOnlinePlayer(Player player
+
+                ):
+                self.playerList[player.getRawUniqueId(self)] = player
+
+                self.updatePlayerListData(player.getUniqueId(self), player.getId(self), player.getDisplayName(self),
+                                          player.getSkinId(self), player.getSkinData(self))
+
+                def removeOnlinePlayer(Player player
+
+                ):
+                if isset(self.playerList[player.getRawUniqueId(self)])):
+                    unset(self.playerList[player.getRawUniqueId(self)])
+
+                pk = PlayerListPacket(self)
+                pk.type = PlayerListPacket::TYPE_REMOVE
+                pk.entries[] = [player.getUniqueId(self)]
+                self.broadcastPacket(self.playerList, pk)
+
+                def updatePlayerListData(UUID uuid, entityId, name, skinId, skinData, array
+
+                players = null):
+                pk = PlayerListPacket(self)
+                pk.type = PlayerListPacket::TYPE_ADD
+                pk.entries[] = [uuid, entityId, name, skinId, skinData]
+                self.broadcastPacket(players == null ? self.playerList: players, pk)
 
 
-            def doAutoSave(self):
-                if self.getAutoSave(self)):
-                    Timings::worldSaveTimer.startTiming(self)
-                foreach(self.players as index = > player):
-                if player.joined):
-                    player.save(True)
-                elif ! player.isConnected(self)):
-                    self.removePlayer(player)
+                def removePlayerListData(UUID uuid, array
 
+                players = null):
+                pk = PlayerListPacket(self)
+                pk.type = PlayerListPacket::TYPE_REMOVE
+                pk.entries[] = [uuid]
+                self.broadcastPacket(players == null ? self.playerList: players, pk)
+
+
+                def sendFullPlayerListData(Player p
+
+                ):
+                pk = PlayerListPacket(self)
+                pk.type = PlayerListPacket::TYPE_ADD
+                foreach(self.playerList as player):
+                pk.entries[] = [player.getUniqueId(self), player.getId(self), player.getDisplayName(self),
+                                player.getSkinId(self),
+                                player.getSkinData(self)]
+
+                p.dataPacket(pk)
+
+                private
+                function
+                checkTickUpdates(currentTick, tickTime):
+                foreach(self.players as p):
+                if not p.loggedIn and (tickTime - p.creationTime) >= 10):
+                    p.close("", "Login timeout")
+                elif self.alwaysTickPlayers and p.joined):
+                    p.onUpdate(currentTick)
+
+                    // Do
+                level
+                ticks
                 foreach(self.getLevels(self) as level):
-                level.save(False)
+                if level.getTickRate(self) > self.baseTickRate and - -level.tickRateCounter > 0):
+                    continue
 
-                Timings::worldSaveTimer.stopTiming(self)
-
-                def sendUsage(type=SendUsageTask:
-                    :
-
-                TYPE_STATUS):
-                if self.getProperty("anonymous-statistics.enabled", True)):
-                    self.scheduler.scheduleAsyncTask(SendUsageTask(this, type, self.uniquePlayers))
-
-                self.uniquePlayers = []
-
-
-
-                # ===========================================================================
-                # @return BaseLang
-                # ===========================================================================
-
-
-            def getLanguage(self):
-                return self.baseLang
-
-
-            # ===========================================================================
-            # @return bool
-            # ===========================================================================
-            def isLanguageForced(self):
-                return self.forceLanguage
-
-
-            # ===========================================================================
-            # @return Network
-            # ===========================================================================
-            def getNetwork(self):
-                return self.network
-
-
-            # ===========================================================================
-            # @return MemoryManager
-            # ===========================================================================
-            def getMemoryManager(self):
-                return self.memoryManager
-
-
-            private
-            function
-            titleTick(self):
-            d = Utils::getRealMemoryUsage(self)
-
-            u = Utils::getMemoryUsage(True)
-            usage = sprintf("%g/%g/%g/%g MB @ %d threads", round((u[0] / 1024) / 1024, 2),
-                            round((d[0] / 1024) / 1024, 2),
-                            round((u[1] / 1024) / 1024, 2), round((u[2] / 1024) / 1024, 2), Utils::getThreadCount(self))
-
-            echo
-            "\x1b]0" + self.getName(self) + " ".
-            self.getpymineVersion(self).
-            " | Online " + count(self.players) + "/" + self.getMaxPlayers(self).
-            " | Memory " + usage.
-            " | U " + round(self.network.getUpload(self) / 1024, 2).
-            " D " + round(self.network.getDownload(self) / 1024, 2).
-            " kB/s | TPS " + self.getTicksPerSecondAverage(self).
-            " | Load " + self.getTickUsageAverage(self) + "%\x07"
-
-            self.network.resetStatistics(self)
-
-
-            # ===========================================================================
-            # @param string address
-            # @param int    port
-            # @param string payload
-            #
-            # TODO: move this to Network
-            # ===========================================================================
-            def handlePacket(address, port, payload):
                 try:
-                    if strlen(payload) > 2 and substr(payload, 0,
-                                                      2) == "\xfe\xfd" and self.queryHandler instanceof QueryHandler):
-                        self.queryHandler.handle(address, port, payload)
+                    levelTime = microtime(True)
+                    level.doTick(currentTick)
+                    tickMs = (microtime(True) - levelTime)  # 1000
+                    level.tickRateTime = tickMs
+
+                    if self.autoTickRate):
+                        if
+                    tickMs < 50 and level.getTickRate(self) > self.baseTickRate):
+                    level.setTickRate(r=level.getTickRate(self) - 1)
+                    if r > self.baseTickRate):
+                    level.tickRateCounter = level.getTickRate(self)
+
+                    self.getLogger(self).debug(
+                        "Raising level \":level->getName(self)\" tick rate to :level->getTickRate(self) ticks")
+                    elif tickMs >= 50):
+                    if level.getTickRate(self) == self.baseTickRate):
+                        level.setTickRate(
+                            max(self.baseTickRate + 1, min(self.autoTickRateLimit, floor(tickMs / 50))))
+                    self.getLogger(self).debug(
+                        sprintf("Level \"%s\" took %gms, setting tick rate to %d ticks", level.getName(self),
+                                round(tickMs, 2),
+                                level.getTickRate(self)))
+                    elif (tickMs / level.getTickRate(self)) >= 50 and level.getTickRate(
+                        self) < self.autoTickRateLimit):
+                    level.setTickRate(level.getTickRate(self) + 1)
+                    self.getLogger(self).debug(
+                        sprintf("Level \"%s\" took %gms, setting tick rate to %d ticks", level.getName(self),
+                                round(tickMs, 2),
+                                level.getTickRate(self)))
+
+                    level.tickRateCounter = level.getTickRate(self)
+
 
                     except:
-                    if              \pymine\DEBUG > 1):
-                        self.logger.logException(e)
-
-                    self.getNetwork(self).blockAddress(address, 600)
-
-                    // TODO: add
-                    raw
-                    packet
-                    events
-
-                    # ===========================================================================
-                    # Tries to execute a server tick
-                    # ===========================================================================
-                    private
-                    function
-                    tick(self):
-                    tickTime = microtime(True)
-                    if (tickTime - self.nextTick) < -0.025): // Allow
-                    half
-                    a
-                    tick
-                    of
-                    diff
-                    return False
-
-                Timings::serverTickTimer.startTiming(self)
-
-                + +self.tickCounter
-
-                self.checkConsole(self)
-
-                Timings::connectionTimer.startTiming(self)
-                self.network.processInterfaces(self)
-
-                if self.rcon != = null):
-                    self.rcon.check(self)
-
-                Timings::connectionTimer.stopTiming(self)
-
-                Timings::schedulerTimer.startTiming(self)
-                self.scheduler.mainThreadHeartbeat(self.tickCounter)
-                Timings::schedulerTimer.stopTiming(self)
-
-                self.checkTickUpdates(self.tickCounter, tickTime)
-
-                foreach(self.players as player):
-                player.checkNetwork(self)
-
-                if (self.tickCounter & 0b1111) == 0):
-                if self.doTitleTick and Terminal: :
-                hasFormattingCodes(self)):
-                self.titleTick(self)
-
-                self.currentTPS = 20
-                self.currentUse = 0
-
-                if (self.tickCounter & 0b111111111) == 0):
-                try:
-                    self.getPluginManager(self).callEvent(self.queryRegenerateTask = QueryRegenerateEvent(this, 5))
-                    if self.queryHandler != = null):
-                        self.queryHandler.regenerateInfo(self)
-
-                    except:
+                    self.logger.critical(
+                        self.getLanguage(self).translateString("pymine.level.tickError",
+                                                               [level.getName(self), e.getMessage(self)]))
                     self.logger.logException(e)
 
-                self.getNetwork(self).updateName(self)
+                def doAutoSave(self):
+                    if self.getAutoSave(self)):
+                        Timings::worldSaveTimer.startTiming(self)
+                    foreach(self.players as index = > player):
+                    if player.joined):
+                        player.save(True)
+                    elif not player.isConnected(self)):
+                        self.removePlayer(player)
 
-                if self.autoSave and + +self.autoSaveTicker >= self.autoSaveTicks):
-                    self.autoSaveTicker = 0
-                self.doAutoSave(self)
+                    foreach(self.getLevels(self) as level):
+                    level.save(False)
 
-                if self.sendUsageTicker > 0 and - -self.sendUsageTicker == 0):
-                self.sendUsageTicker = 6000
-                self.sendUsage(SendUsageTask::TYPE_STATUS)
+                    Timings::worldSaveTimer.stopTiming(self)
 
+                    def sendUsage(type=SendUsageTask:
+                        :
 
-                if (self.tickCounter % 100) == 0):
-                    foreach(self.levels as level):
-                level.clearCache(self)
+                    TYPE_STATUS):
+                    if self.getProperty("anonymous-statistics.enabled", True)):
+                        self.scheduler.scheduleAsyncTask(SendUsageTask(this, type, self.uniquePlayers))
 
-                if self.getTicksPerSecondAverage(self) < 12):
-                self.logger.warning(self.getLanguage(self).translateString("pymine.server.tickOverload"))
-
-                if self.dispatchSignals and self.tickCounter % 5 == 0):
-                pcntl_signal_dispatch(self)
-
-                self.getMemoryManager(self).check(self)
-
-                Timings.serverTickTimer.stopTiming(self)
-
-                now = microtime(True)
-                self.currentTPS = min(20, 1 / max(0.001, now - tickTime))
-                self.currentUse = min(1, (now - tickTime) / 0.05)
-
-                TimingsHandler.tick(self.currentTPS <= self.profilingTickRate)
-
-                array_shift(self.tickAverage)
-                self.tickAverage[] = self.currentTPS
-                array_shift(self.useAverage)
-                self.useAverage[] = self.currentUse
-
-                if (self.nextTick - tickTime) < -1:
-                    self.nextTick = tickTime
-                else:
-                    self.nextTick += 0.05
-
-                return True
+                    self.uniquePlayers = []
 
 
-            # ===========================================================================
-            # Called when something attempts to serialize the server instance.
-            #
-            # @throws \BadMethodCallException because Server instances cannot be serialized
-            # ===========================================================================
 
-            def __sleep(self):
-                raise ValueError("Cannot serialize Server instance")
+                    # ===========================================================================
+                    # @return BaseLang
+                    # ===========================================================================
+
+                    def getLanguage(self):
+
+                        return self.baseLang
+
+                # ===========================================================================
+                # @return bool
+                # ===========================================================================
+                def isLanguageForced(self):
+                    return self.forceLanguage
+
+                # ===========================================================================
+                # @return Network
+                # ===========================================================================
+                def getNetwork(self):
+                    return self.network
+
+                # ===========================================================================
+                # @return MemoryManager
+                # ===========================================================================
+                def getMemoryManager(self):
+                    return self.memoryManager
+
+                private
+                function
+                titleTick(self):
+                d = Utils::getRealMemoryUsage(self)
+
+                u = Utils::getMemoryUsage(True)
+                usage = sprintf("%g/%g/%g/%g MB @ %d threads", round((u[0] / 1024) / 1024, 2),
+                                round((d[0] / 1024) / 1024, 2),
+                                round((u[1] / 1024) / 1024, 2), round((u[2] / 1024) / 1024, 2),
+                                Utils::getThreadCount(self))
+
+                echo
+                "\x1b]0" + self.getName(self) + " ".
+                self.getpymineVersion(self).
+                " | Online " + count(self.players) + "/" + self.getMaxPlayers(self).
+                " | Memory " + usage.
+                " | U " + round(self.network.getUpload(self) / 1024, 2).
+                " D " + round(self.network.getDownload(self) / 1024, 2).
+                " kB/s | TPS " + self.getTicksPerSecondAverage(self).
+                " | Load " + self.getTickUsageAverage(self) + "%\x07"
+
+                self.network.resetStatistics(self)
+
+                # ===========================================================================
+                # @param string address
+                # @param int    port
+                # @param string payload
+                #
+                # TODO: move this to Network
+                # ===========================================================================
+                def handlePacket(address, port, payload):
+                    try:
+                        if strlen(payload) > 2 and substr(payload, 0,
+                                                          2) == "\xfe\xfd" and self.queryHandler instanceof QueryHandler):
+                            self.queryHandler.handle(address, port, payload)
+
+                        except:
+                        if                    \pymine\DEBUG > 1):
+                            self.logger.logException(e)
+
+                        self.getNetwork(self).blockAddress(address, 600)
+
+                        // TODO: add
+                        raw
+                        packet
+                        events
+
+                        # ===========================================================================
+                        # Tries to execute a server tick
+                        # ===========================================================================
+                        private
+                        function
+                        tick(self):
+                        tickTime = microtime(True)
+                        if (tickTime - self.nextTick) < -0.025): // Allow
+                        half
+                        a
+                        tick
+                        of
+                        diff
+                        return False
+
+                    Timings::serverTickTimer.startTiming(self)
+
+                    + +self.tickCounter
+
+                    self.checkConsole(self)
+
+                    Timings::connectionTimer.startTiming(self)
+                    self.network.processInterfaces(self)
+
+                    if self.rcon is not None):
+                        self.rcon.check(self)
+
+                    Timings::connectionTimer.stopTiming(self)
+
+                    Timings::schedulerTimer.startTiming(self)
+                    self.scheduler.mainThreadHeartbeat(self.tickCounter)
+                    Timings::schedulerTimer.stopTiming(self)
+
+                    self.checkTickUpdates(self.tickCounter, tickTime)
+
+                    foreach(self.players as player):
+                    player.checkNetwork(self)
+
+                    if (self.tickCounter & 0b1111) == 0):
+                    if self.doTitleTick and Terminal: :
+                    hasFormattingCodes(self)):
+                    self.titleTick(self)
+
+                    self.currentTPS = 20
+                    self.currentUse = 0
+
+                    if (self.tickCounter & 0b111111111) == 0):
+                    try:
+                        self.getPluginManager(self).callEvent(self.queryRegenerateTask = QueryRegenerateEvent(this,
+                                                                                                              5))
+                        if self.queryHandler is not None):
+                            self.queryHandler.regenerateInfo(self)
+
+                        except:
+                        self.logger.logException(e)
+
+                    self.getNetwork(self).updateName(self)
+
+                    if self.autoSave and + +self.autoSaveTicker >= self.autoSaveTicks):
+                        self.autoSaveTicker = 0
+                    self.doAutoSave(self)
+
+                    if self.sendUsageTicker > 0 and - -self.sendUsageTicker == 0):
+                    self.sendUsageTicker = 6000
+                    self.sendUsage(SendUsageTask::TYPE_STATUS)
+
+
+                    if (self.tickCounter % 100) == 0):
+                        foreach(self.levels as level):
+                    level.clearCache(self)
+
+                    if self.getTicksPerSecondAverage(self) < 12):
+                    self.logger.warning(self.getLanguage(self).translateString("pymine.server.tickOverload"))
+
+                    if self.dispatchSignals and self.tickCounter % 5 == 0):
+                    pcntl_signal_dispatch(self)
+
+                    self.getMemoryManager(self).check(self)
+
+                    Timings.serverTickTimer.stopTiming(self)
+
+                    now = microtime(True)
+                    self.currentTPS = min(20, 1 / max(0.001, now - tickTime))
+                    self.currentUse = min(1, (now - tickTime) / 0.05)
+
+                    TimingsHandler.tick(self.currentTPS <= self.profilingTickRate)
+
+                    array_shift(self.tickAverage)
+                    self.tickAverage[] = self.currentTPS
+                    array_shift(self.useAverage)
+                    self.useAverage[] = self.currentUse
+
+                    if (self.nextTick - tickTime) < -1:
+                        self.nextTick = tickTime
+                    else:
+                        self.nextTick += 0.05
+
+                    return True
+
+                # ===========================================================================
+                # Called when something attempts to serialize the server instance.
+                #
+                # @throws \BadMethodCallException because Server instances cannot be serialized
+                # ===========================================================================
+
+                def __sleep(self):
+                    raise ValueError("Cannot serialize Server instance")

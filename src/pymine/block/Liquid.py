@@ -1,7 +1,8 @@
 from .Transparent import *
+from abc import *
 
 
-class Liquid(Transparent):
+class Liquid(metaclass=ABCMeta, Transparent):
     temporalVector = None
 
     def hasEntityCollision(self):
@@ -82,7 +83,7 @@ class Liquid(Transparent):
                 blockDecay = self.getEffectiveFlowDecay(
                     self.getLevel().getBlock(self.temporalVector.setComponents(x, y - 1, z)))
 
-                if blockDecay>=0:
+                if blockDecay >= 0:
                     realDecay = blockDecay - (decay - 8)
                     vector.x += (sideBlock.x - self.x) * realDecay
                     vector.y += (sideBlock.y - self.y) * realDecay
@@ -97,4 +98,3 @@ class Liquid(Transparent):
 
         if self.getDamage() >= 8:
             falling = False
-

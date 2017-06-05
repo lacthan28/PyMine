@@ -1,3 +1,5 @@
+# coding=utf-8
+from abc import *
 from copy import *
 from .CommandSender import *
 from .ConsoleCommandSender import *
@@ -9,7 +11,7 @@ from ..str_replace import *
 from ..utils.TextFormat import *
 
 
-class Command:
+class Command(metaclass=ABCMeta):
     """ :type list """
     defaultDataTemplate = None
 
@@ -118,6 +120,7 @@ class Command:
     :return mixed
     """
 
+    @abstractmethod
     def execute(self, sender: CommandSender, commandLabel, args: list):
         pass
 
