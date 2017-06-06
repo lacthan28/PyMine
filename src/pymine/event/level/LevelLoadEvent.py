@@ -2,5 +2,5 @@
 from pymine.event.level.LevelEvent import LevelEvent
 
 
-class LevelInitEvent(LevelEvent):
+class LevelLoadEvent(LevelEvent):
     handlerList = None

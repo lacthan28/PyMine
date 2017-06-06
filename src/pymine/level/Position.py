@@ -1,4 +1,4 @@
-from ..math.Vector3 import *
+from ..maths.Vector3 import *
 from .Level import *
 
 

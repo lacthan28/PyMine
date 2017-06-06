@@ -1,7 +1,7 @@
 from src.pymine.isset import isset
 from .Position import *
 from .Level import *
-from ..math.Vector3 import *
+from ..maths.Vector3 import *
 
 
 class Location(Position):

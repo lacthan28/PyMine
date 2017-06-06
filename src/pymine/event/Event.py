@@ -1,26 +1,31 @@
-from src.pymine.event import Cancellable, HandlerList
-class Event:
+# coding=utf-8
+from .Cancellable import *
+from .HandlerList import *
+from abc import *
+
+
+class Event(metaclass=ABCMeta):
     eventName = None
-    isCancelled = False
-    handlerList = None
+    varIsCancelled = False
 
     def getEventName(self):
-        return self.eventName == None if type(self).__name__ else self.eventName
+        return self.eventName is None if type(self).__name__ else self.eventName
 
     def isCancelled(self):
         if not isinstance(self, Cancellable):
-            raise ValueError("Event is not Cancellable")
+            raise BaseException("Event is not Cancellable")
 
-        return self.isCancelled() == True
+        return Event.varIsCancelled is True
 
-    def setCancelled(self, value = True):
+    def setCancelled(self, value=True):
         if not isinstance(self, Cancellable):
-            raise ValueError("Event is not Cancellable")
+            raise BaseException("Event is not Cancellable")
 
-        self.isCancelled = value
+        Event.varIsCancelled = bool(value)
 
     def getHandlers(self):
-        if self.handlerList is None:
-            self.handlerList = HandlerList()
+        global handlerList
+        if handlerList is None:
+            handlerList = HandlerList()
 
-        return self.handlerLists
+        return handlerList

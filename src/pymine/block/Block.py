@@ -6,7 +6,7 @@ from ..item.Item import *
 from ..block import *
 from ..metadata.Metadatable import *
 from ..level.Position import *
-from ..math.Vector3 import *
+from ..maths.Vector3 import *
 from ...spl.stubs.Core import *
 from .BlockIds import *
 

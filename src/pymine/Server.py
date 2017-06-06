@@ -1,13 +1,19 @@
 # coding=utf-8
 from random import randint
 
-from .level.format.io.LevelProviderManager import *
-from .level.generator.Generator import *
+import time
+
+import math
+
+from pymine.level.format.io.LevelProviderManager import LevelProviderManager
+from pymine.level.generator.Generator import Generator
+from pymine.nbt.NBT import NBT
+from pymine.nbt.tag.CompoundTag import CompoundTag
+from pymine.scheduler.FileWriteTask import FileWriteTask
 from .OfflinePlayer import *
 from .Player import *
 from .PyMine import *
 from .inventory.Recipe import *
-from .level.Level import *
 
 
 class Server:
@@ -845,6 +851,7 @@ class Server:
     # @return bool
     # ===========================================================================
     def generateLevel(self, name, seed=null, generator=null, options=dict()):
+        global provider, provider
         if name.strip() == "" or self.isLevelGenerated(name):
             return False
 
@@ -864,7 +871,7 @@ class Server:
             path = self.getDataPath(self) + "worlds/" + name + "/"
             # ===========================================================================
             # @var \pymine\level\format\io\LevelProvider provider
-            # #===========================================================================
+            # ===========================================================================
             provider.generate(path, name, seed, generator, options)
 
             level = Level(self, name, path, provider)
@@ -891,12 +898,12 @@ class Server:
 
         order = []
 
-        for (X=-3 X <= 3 + +X):
-            for (Z=-3 Z <= 3 + +Z):
-                distance = X *  # 2 + Z *# 2
+        for X in range(-3, 4):
+            for Z in range(-3, 4):
+                distance = X ** 2 + Z ** 2
                 chunkX = X + centerX
                 chunkZ = Z + centerZ
-                index = Level::chunkHash(chunkX, chunkZ)
+                index = Level.chunkHash(chunkX, chunkZ)
                 order[index] = distance
 
         asort(order)
@@ -1206,7 +1213,8 @@ Server::sleeper.wait(ms)
 # @param string          dataPath
 # @param string          pluginPath
 # ===========================================================================
-def __construct(\ClassLoader autoloader,                    \ThreadedLogger logger, filePath, dataPath, pluginPath):
+def __construct(\ClassLoader autoloader,                            \ThreadedLogger logger, filePath, dataPath,
+                pluginPath):
     self::instance = this
     self::sleeper = \Threaded
     self.autoloader = autoloader
@@ -1354,7 +1362,7 @@ def __construct(\ClassLoader autoloader,                    \ThreadedLogger logg
             self.logger.setLogDebug(\pymine\DEBUG > 1)
 
 
-        if                    \pymine\DEBUG >= 0):
+        if                            \pymine\DEBUG >= 0):
             @
         cli_set_process_title(self.getName(self) + " " + self.getpymineVersion(self))
 
@@ -1976,7 +1984,7 @@ def enablePlugins(type):
     PharPluginLoader)):
     report = False
 
-    elif                    \Phar::running(True) == "":
+    elif                            \Phar::running(True) == "":
     report = False
 
     if dump.getData(self)["error"]["type"] == "E_PARSE" or dump.getData(self)["error"][
@@ -2236,7 +2244,7 @@ def enablePlugins(type):
                             self.queryHandler.handle(address, port, payload)
 
                         except:
-                        if                    \pymine\DEBUG > 1):
+                        if                            \pymine\DEBUG > 1):
                             self.logger.logException(e)
 
                         self.getNetwork(self).blockAddress(address, 600)
