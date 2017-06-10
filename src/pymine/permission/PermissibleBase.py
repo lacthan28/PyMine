@@ -1,5 +1,5 @@
 # coding=utf-8
-from pymine.isset import isset
+from spl.stubs.isset import isset
 from .Permissible import *
 from .ServerOperator import *
 

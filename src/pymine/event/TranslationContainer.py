@@ -1,6 +1,6 @@
 from array import *
 
-from ..isset import *
+from spl.stubs.isset import *
 
 
 class TranslationContainer:

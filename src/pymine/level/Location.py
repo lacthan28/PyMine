@@ -1,6 +1,6 @@
-from src.pymine.isset import isset
-from .Position import *
+from spl.stubs.isset import isset
 from .Level import *
+from .Position import *
 from ..maths.Vector3 import *
 
 

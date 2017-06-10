@@ -1,9 +1,7 @@
-from .Player import *
+from spl.stubs.isset import *
+from .Server import *
 from .event.TranslationContainer import *
 from .utils.TextFormat import *
-from .Server import *
-from .isset import *
-from array import *
 
 
 class Achievement:

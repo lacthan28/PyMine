@@ -1,12 +1,13 @@
 # coding=utf-8
 from abc import *
 from copy import *
+
+from spl.stubs.isset import *
 from .CommandSender import *
 from .ConsoleCommandSender import *
 from ..Server import *
 from ..command.CommandMap import *
 from ..event.TranslationContainer import *
-from ..isset import *
 from ..str_replace import *
 from ..utils.TextFormat import *
 

@@ -1,14 +1,13 @@
-from .Liquid import *
-from ..entity.Entity import *
 from .Air import *
+from .BlockIds import *
+from .Liquid import *
 from ..Player import *
-from ..item.Item import *
 from ..block import *
-from ..metadata.Metadatable import *
+from ..entity.Entity import *
+from ..item.Item import *
 from ..level.Position import *
 from ..maths.Vector3 import *
-from ...spl.stubs.Core import *
-from .BlockIds import *
+from ..metadata.Metadatable import *
 
 
 class Block(BlockIds, Metadatable, Position):
@@ -26,10 +25,8 @@ class Block(BlockIds, Metadatable, Position):
     boundingBox = None
 
     def init(self):
-
-        global block
         if self.list is None:
-            self.list = dict()
+            self.list = FixedDict(256)
             self.fullList = []
             self.light = []
             self.lightFilter = []
@@ -37,6 +34,7 @@ class Block(BlockIds, Metadatable, Position):
             self.hardness = []
             self.transparent = []
 
+            self.list[self.ACACIA_DOOR_BLOCK] = AcaciaDoor
             list = {
                 self.ACACIA_DOOR_BLOCK: AcaciaDoor,
                 self.AIR: Air,

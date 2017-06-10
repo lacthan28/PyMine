@@ -1,3 +1,4 @@
+# coding=utf-8
 from src.pymine.utils.Binary import *
 
 
@@ -17,20 +18,23 @@ class NBT:
     TAG_Compound = 10
     TAG_IntArray = 11
 
-    buffer, offset, endianness, data = None
+    buffer = None
+    offset = None
+    endianness = None
+    data = None
 
     def __init__(self, endianness=LITTLE_ENDIAN):
         self.offset = 0
         self.endianness = endianness & 0x01
 
-    def get(self, len):
-        if (len < 0):
-            self.offset = len(self.buffer) - 1
+    def get(self, length):
+        if length < 0:
+            self.offset = length(self.buffer) - 1
             return ""
-        elif (len == True):
+        elif length:
             return self.buffer[self.offset:self.offset]
-        self.offset += len
-        return len == 1 if self.buffer[self.offset + 1] else self.buffer[(self.offset - len), len]
+        self.offset += length
+        return length == 1 if self.buffer[self.offset + 1] else self.buffer[(self.offset - length), length]
 
     def getInt(self, network=False):
         if network is True:

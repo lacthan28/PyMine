@@ -1,8 +1,7 @@
 # coding=utf-8
 from pymine import Server
 from pymine.PyMine import is_array
-from pymine.isset import isset
-from pymine.permission import Permissible
+from spl.stubs.isset import isset
 
 DEFAULT_OP = 'op'
 DEFAULT_NOT_OP = 'notop'

@@ -1,11 +1,6 @@
+# coding=utf-8
 from ..spl.stubs.Core import *
-from ..spl.stubs.core_d import *
 
-is_array = lambda var: isinstance(var, (list, tuple))
-
-
-def str_repeat(the_str, multiplier):
-    return the_str * multiplier
 
 
 def safe_var_dump():

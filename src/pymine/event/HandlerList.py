@@ -1,9 +1,9 @@
 # coding=utf-8
 from pymine.plugin.RegisteredListener import *
+from spl.stubs.isset import *
 from .EventPriority import *
 from .Listener import *
 from .plugin.Plugin import *
-from ..isset import *
 
 
 class HandlerList:
