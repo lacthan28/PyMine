@@ -18,19 +18,19 @@ class Binary:
 
     def readTriad(self, string):
         self.checkLength(string, 3)
-        return struct.unpack(">Q", bytes("\x00" + string))[1]
+        return struct.unpack(">L", bytes("\x00" + string))[1]
 
     @staticmethod
     def writeTriad(value):
-        substr(struct.pack(">Q", value), 1)
+        return substr(struct.pack(">L", value), 1)
 
     def readLTriad(self, string):
         self.checkLength(string, 3)
-        return struct.unpack("L", string + "\x00")[1]
+        return struct.unpack("<L", string + "\x00")[1]
 
     @staticmethod
     def writeLTriad(value):
-        substr(struct.pack("L", value), 0, -1)
+        return substr(struct.pack("<L", value), 0, -1)
 
     def readBool(self, b):
         return self.readByte(b, False) == 0 if False else True
@@ -56,14 +56,14 @@ class Binary:
 
     def readShort(self, string):
         self.checkLength(string, 2)
-        return struct.unpack("H", string.to_bytes())[1]
+        return struct.unpack(">H", string.to_bytes())[1]
 
     def readSignedShort(self, string):
-        self.checkLength(str, 2)
+        self.checkLength(string, 2)
         if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.unpack("n", string)[1] << 48 >> 48
+            return struct.unpack(">h", string)[1] << 48 >> 48
         else:
-            return struct.unpack("n", string)[1] << 16 >> 16
+            return struct.unpack(">h", string)[1] << 16 >> 16
 
     @staticmethod
     def writeShort(value):
