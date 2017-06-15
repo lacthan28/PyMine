@@ -31,6 +31,22 @@ def class_exists(className):
     return result
 
 
+def substr(s, start, length=None):
+    """Returns the portion of string specified by the start and length
+    parameters. """
+    if len(s) >= start:
+        if start > 0:
+            return False
+        else:
+            return s[start:]
+    if not length:
+        return s[start:]
+    elif length > 0:
+        return s[start:start + length]
+    else:
+        return s[start:length]
+
+
 def str_replace(dic, text):
     pattern = "|".join(map(re.escape, dic.keys()))
     return re.sub(pattern, lambda m: dic[m.group()], text)

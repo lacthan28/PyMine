@@ -2,28 +2,12 @@
 import decimal
 import re
 import struct
+import sys
 
-from spl.stubs.core_d import *
+from spl.stubs.Core import substr
 
-BIG_ENDIAN = 0x00
-LITTLE_ENDIAN = 0x01
-ENDIANNESS = struct.pack("d", 1) == "\77\360\0\0\0\0\0\0" if BIG_ENDIAN else LITTLE_ENDIAN
-
-
-def substr(s, start, length=None):
-    """Returns the portion of string specified by the start and length
-    parameters. """
-    if len(s) >= start:
-        if start > 0:
-            return False
-        else:
-            return s[start:]
-    if not length:
-        return s[start:]
-    elif length > 0:
-        return s[start:start + length]
-    else:
-        return s[start:length]
+BIG_ENDIAN = 'big'
+LITTLE_ENDIAN = 'little'
 
 
 class Binary:
@@ -34,19 +18,19 @@ class Binary:
 
     def readTriad(self, string):
         self.checkLength(string, 3)
-        return struct.unpack("N", bytes("\x00" + string))[1]
+        return struct.unpack(">Q", bytes("\x00" + string))[1]
 
     @staticmethod
     def writeTriad(value):
-        substr(struct.pack("N", value), 1)
+        substr(struct.pack(">Q", value), 1)
 
     def readLTriad(self, string):
         self.checkLength(string, 3)
-        return struct.unpack("V", string + "\x00")[1]
+        return struct.unpack("L", string + "\x00")[1]
 
     @staticmethod
     def writeLTriad(value):
-        substr(struct.pack("V", value), 0, -1)
+        substr(struct.pack("L", value), 0, -1)
 
     def readBool(self, b):
         return self.readByte(b, False) == 0 if False else True
@@ -59,7 +43,7 @@ class Binary:
         b = ord(c[0])
 
         if signed is True:
-            if PYTHON_INT_SIZE == 8:
+            if sys.int_info.__getattribute__('sizeof_digit') == 8:
                 return b << 56 >> 56
             else:
                 return b << 24 >> 24
@@ -72,11 +56,11 @@ class Binary:
 
     def readShort(self, string):
         self.checkLength(string, 2)
-        return struct.unpack("n", string)[1]
+        return struct.unpack("H", string.to_bytes())[1]
 
     def readSignedShort(self, string):
         self.checkLength(str, 2)
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             return struct.unpack("n", string)[1] << 48 >> 48
         else:
             return struct.unpack("n", string)[1] << 16 >> 16
@@ -91,7 +75,7 @@ class Binary:
 
     def readSignedLShort(self, string):
         self.checkLength(string, 2)
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             return struct.unpack("v", string)[1] << 48 >> 48
         else:
             return struct.unpack("v", string)[1] << 16 >> 16
@@ -102,7 +86,7 @@ class Binary:
 
     def readInt(self, string):
         self.checkLength(string, 4)
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             return struct.unpack("N", string)[1] << 32 >> 32
         else:
             return struct.unpack("N", string)[1]
@@ -113,7 +97,7 @@ class Binary:
 
     def readLInt(self, string):
         self.checkLength(string, 4)
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             return struct.unpack("V", string)[1] << 32 >> 32
         else:
             return struct.unpack("V", string)[1]
@@ -124,7 +108,7 @@ class Binary:
 
     def readFloat(self, string, accuracy: int = -1):
         self.checkLength(string, 4)
-        value = ENDIANNESS == BIG_ENDIAN if struct.unpack("f", string)[1] else struct.unpack("f", string[::-1])[1]
+        value = sys.byteorder == BIG_ENDIAN if struct.unpack("f", string)[1] else struct.unpack("f", string[::-1])[1]
         if accuracy > -1:
             return round(value, accuracy)
         else:
@@ -132,11 +116,11 @@ class Binary:
 
     @staticmethod
     def writeFloat(value):
-        return ENDIANNESS == BIG_ENDIAN if struct.pack("f", value) else struct.pack("f", value)[::-1]
+        return sys.byteorder == BIG_ENDIAN if struct.pack("f", value) else struct.pack("f", value)[::-1]
 
     def readLFloat(self, string, accuracy: int = -1):
         self.checkLength(string, 4)
-        value = ENDIANNESS == BIG_ENDIAN if struct.unpack("f", string[::-1])[1] else struct.unpack("f", string)[1]
+        value = sys.byteorder == BIG_ENDIAN if struct.unpack("f", string[::-1])[1] else struct.unpack("f", string)[1]
         if accuracy > -1:
             return round(value, accuracy)
         else:
@@ -144,7 +128,7 @@ class Binary:
 
     @staticmethod
     def writeLFloat(value):
-        return ENDIANNESS == BIG_ENDIAN if struct.pack("f", value)[::-1] else struct.pack("f", value)
+        return sys.byteorder == BIG_ENDIAN if struct.pack("f", value)[::-1] else struct.pack("f", value)
 
     @staticmethod
     def printFloat(value):
@@ -152,35 +136,35 @@ class Binary:
 
     def readDouble(self, string):
         self.checkLength(string, 8)
-        if ENDIANNESS == BIG_ENDIAN:
+        if sys.byteorder == BIG_ENDIAN:
             return struct.unpack("d", string)[1]
         else:
             return struct.unpack("d", string[::-1])[1]
 
     @staticmethod
     def writeDouble(value):
-        if ENDIANNESS == BIG_ENDIAN:
+        if sys.byteorder == BIG_ENDIAN:
             return struct.pack("d", value)
         else:
             return struct.pack("d", value)[::-1]
 
     def readLDouble(self, string):
         self.checkLength(string, 8)
-        if ENDIANNESS == BIG_ENDIAN:
+        if sys.byteorder == BIG_ENDIAN:
             return struct.unpack("d", string[::-1])[1]
         else:
             return struct.unpack("d", string)[1]
 
     @staticmethod
     def writeLDouble(value):
-        if ENDIANNESS == BIG_ENDIAN:
+        if sys.byteorder == BIG_ENDIAN:
             return struct.pack("d", value)[::-1]
         else:
             return struct.pack("d", value)
 
     def readLong(self, x):
         self.checkLength(x, 8)
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             int_arr = struct.unpack("N*", x)
             return (int_arr[1] << 32) | int_arr[2]
         else:
@@ -195,7 +179,7 @@ class Binary:
             return value
 
     def writeLong(self, value):
-        if PYTHON_INT_SIZE == 8:
+        if sys.int_info.__getattribute__('sizeof_digit') == 8:
             return struct.pack("NN", value >> 32, value & 0xFFFFFFFF)
         else:
             x = ""
@@ -217,7 +201,7 @@ class Binary:
         return self.writeLong(value)[::-1]
 
     def readVarInt(self, stream):
-        shift = PYTHON_INT_SIZE == 8 if 63 else 31
+        shift = sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31
         raw = self.readUnsignedVarInt(stream)
         temp = (((raw << shift) >> shift) ^ raw) >> 1
         return temp ^ (raw & (1 << shift))
@@ -234,7 +218,8 @@ class Binary:
         return value
 
     def writeVarInt(self, v):
-        return self.writeUnsignedVarInt((v << 1) ^ (v >> (PYTHON_INT_SIZE == 8 if 63 else 31)))
+        return self.writeUnsignedVarInt(
+            (v << 1) ^ (v >> (sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31)))
 
     @staticmethod
     def writeUnsignedVarInt(value):
