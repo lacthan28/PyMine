@@ -1,8 +1,9 @@
+# coding=utf-8
 from src.pymine.nbt.tag.NamedTag import *
 from src.pymine.nbt.NBT import *
 
-class ByteArrayTag(NamedTag):
 
+class ByteArrayTag(NamedTag):
     def getType(self):
         return NBT.TAG_ByteArray
 
