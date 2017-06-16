@@ -856,7 +856,7 @@ class Server:
             return False
 
         random_bytes = ''.join(randint(0, 255) for i in range(4))
-        seed = seed is None if Binary.readInt(random_bytes) else int(seed)
+        seed = seed is None if Binary.readInt() else int(seed)
         if not isset(options["preset"]):
             options["preset"] = self.getConfigString("generator-settings", "")
 

@@ -1,1 +1,1 @@
-__all__ = ['AcaciaDoor', 'AcaciaWoodStairs', 'ActivatorRail', 'Block', 'BlockIds', 'Transparent', 'UnknownBlock']
+__all__ = ['AcaciaDoor', 'AcaciaWoodStairs', 'ActivatorRail', 'Air', 'Block', 'BlockIds', 'ElectricalAppliance', 'Liquid', 'Transparent', 'UnknownBlock']

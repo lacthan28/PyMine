@@ -32,8 +32,8 @@ class UUID:
     def fromBinary(uuid, version=None):
         if len(uuid) is not 16:
             raise ValueError("Must have exactly 16 bytes")
-        return UUID(Binary.readInt(uuid[0:4]), Binary.readInt(uuid[4:8]), Binary.readInt(uuid[8:12]),
-                    Binary.readInt(uuid[12:16]), version)
+        return UUID(Binary.readInt(), Binary.readInt(), Binary.readInt(),
+                    Binary.readInt(), version)
 
     def fromData(self, *data):
         h = md5()

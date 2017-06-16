@@ -6,231 +6,254 @@ import sys
 
 from spl.stubs.Core import substr
 
-BIG_ENDIAN = 'big'
-LITTLE_ENDIAN = 'little'
+
+def checkLength(string, expect):
+	length = len(string)
+	assert length == expect, "Expected " + expect + " bytes, got " + str(length)
 
 
 class Binary:
-    @staticmethod
-    def checkLength(string, expect):
-        length = len(string)
-        assert length == expect, "Expected " + expect + " bytes, got " + str(length)
+	BIG_ENDIAN = 'big'
+	LITTLE_ENDIAN = 'little'
 
-    def readTriad(self, string):
-        self.checkLength(string, 3)
-        return struct.unpack(">L", bytes("\x00" + string))[1]
+	@staticmethod
+	def readTriad(string):
+		checkLength(string, 3)
+		return struct.unpack(">L", bytes("\x00" + string))[1]
 
-    @staticmethod
-    def writeTriad(value):
-        return substr(struct.pack(">L", value), 1)
+	@staticmethod
+	def writeTriad(value):
+		return substr(struct.pack(">L", value), 1)
 
-    def readLTriad(self, string):
-        self.checkLength(string, 3)
-        return struct.unpack("<L", string + "\x00")[1]
+	@staticmethod
+	def readLTriad(string):
+		checkLength(string, 3)
+		return struct.unpack("<L", string + "\x00")[1]
 
-    @staticmethod
-    def writeLTriad(value):
-        return substr(struct.pack("<L", value), 0, -1)
+	@staticmethod
+	def writeLTriad(value):
+		return substr(struct.pack("<L", value), 0, -1)
 
-    def readBool(self, b):
-        return self.readByte(b, False) == 0 if False else True
+	@staticmethod
+	def readBool(b):
+		return Binary.readByte(b, False) == 0 if False else True
 
-    def writeBool(self, b):
-        return self.writeByte(b is True if 1 else 0)
+	@staticmethod
+	def writeBool(b):
+		return Binary.writeByte(b is True if 1 else 0)
 
-    def readByte(self, c, signed=True):
-        self.checkLength(c, 1)
-        b = ord(c[0])
+	@staticmethod
+	def readByte(c, signed = True):
+		checkLength(c, 1)
+		b = ord(c[0])
 
-        if signed is True:
-            if sys.int_info.__getattribute__('sizeof_digit') == 8:
-                return b << 56 >> 56
-            else:
-                return b << 24 >> 24
-        else:
-            return b
+		if signed is True:
+			if sys.int_info.__getattribute__('sizeof_digit') == 8:
+				return b << 56 >> 56
+			else:
+				return b << 24 >> 24
+		else:
+			return b
 
-    @staticmethod
-    def writeByte(c):
-        return chr(c)
+	@staticmethod
+	def writeByte(c):
+		return chr(c)
 
-    def readShort(self, string):
-        self.checkLength(string, 2)
-        return struct.unpack(">H", string.to_bytes())[1]
+	@staticmethod
+	def readShort(string):
+		checkLength(string, 2)
+		return struct.unpack(">h", string.to_bytes())[1]
 
-    def readSignedShort(self, string):
-        self.checkLength(string, 2)
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.unpack(">h", string)[1] << 48 >> 48
-        else:
-            return struct.unpack(">h", string)[1] << 16 >> 16
+	@staticmethod
+	def readSignedShort(string):
+		checkLength(string, 2)
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			return struct.unpack(">h", string)[1] << 48 >> 48
+		else:
+			return struct.unpack(">h", string)[1] << 16 >> 16
 
-    @staticmethod
-    def writeShort(value):
-        return struct.pack("n", value)
+	@staticmethod
+	def writeShort(value):
+		return struct.pack(">h", value)
 
-    def readLShort(self, string):
-        self.checkLength(string, 2)
-        return struct.unpack("v", string)[1]
+	@staticmethod
+	def readLShort(string):
+		checkLength(string, 2)
+		return struct.unpack("<h", string)[1]
 
-    def readSignedLShort(self, string):
-        self.checkLength(string, 2)
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.unpack("v", string)[1] << 48 >> 48
-        else:
-            return struct.unpack("v", string)[1] << 16 >> 16
+	@staticmethod
+	def readSignedLShort(string):
+		checkLength(string, 2)
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			return struct.unpack("<h", string)[1] << 48 >> 48
+		else:
+			return struct.unpack("<h", string)[1] << 16 >> 16
 
-    @staticmethod
-    def writeLShort(value):
-        return struct.pack("v", value)
+	@staticmethod
+	def writeLShort(value):
+		return struct.pack("<h", value)
 
-    def readInt(self, string):
-        self.checkLength(string, 4)
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.unpack("N", string)[1] << 32 >> 32
-        else:
-            return struct.unpack("N", string)[1]
+	@staticmethod
+	def readInt(string):
+		checkLength(string, 4)
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			return struct.unpack(">L", string)[1] << 32 >> 32
+		else:
+			return struct.unpack(">L", string)[1]
 
-    @staticmethod
-    def writeInt(value):
-        return struct.pack("N", value)
+	@staticmethod
+	def writeInt(value):
+		return struct.pack(">L", value)
 
-    def readLInt(self, string):
-        self.checkLength(string, 4)
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.unpack("V", string)[1] << 32 >> 32
-        else:
-            return struct.unpack("V", string)[1]
+	@staticmethod
+	def readLInt(string):
+		checkLength(string, 4)
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			return struct.unpack("<L", string)[1] << 32 >> 32
+		else:
+			return struct.unpack("<L", string)[1]
 
-    @staticmethod
-    def writeLInt(value):
-        return struct.pack("V", value)
+	@staticmethod
+	def writeLInt(value):
+		return struct.pack("<L", value)
 
-    def readFloat(self, string, accuracy: int = -1):
-        self.checkLength(string, 4)
-        value = sys.byteorder == BIG_ENDIAN if struct.unpack("f", string)[1] else struct.unpack("f", string[::-1])[1]
-        if accuracy > -1:
-            return round(value, accuracy)
-        else:
-            return value
+	@staticmethod
+	def readFloat(string, accuracy: int = -1):
+		checkLength(string, 4)
+		value = sys.byteorder == Binary.BIG_ENDIAN if struct.unpack(">f", string)[1] else \
+			struct.unpack(">f", string[::-1])[1]
+		if accuracy > -1:
+			return round(value, accuracy)
+		else:
+			return value
 
-    @staticmethod
-    def writeFloat(value):
-        return sys.byteorder == BIG_ENDIAN if struct.pack("f", value) else struct.pack("f", value)[::-1]
+	@staticmethod
+	def writeFloat(value):
+		return sys.byteorder == Binary.BIG_ENDIAN if struct.pack(">f", value) else struct.pack(">f", value)[::-1]
 
-    def readLFloat(self, string, accuracy: int = -1):
-        self.checkLength(string, 4)
-        value = sys.byteorder == BIG_ENDIAN if struct.unpack("f", string[::-1])[1] else struct.unpack("f", string)[1]
-        if accuracy > -1:
-            return round(value, accuracy)
-        else:
-            return value
+	@staticmethod
+	def readLFloat(string, accuracy: int = -1):
+		checkLength(string, 4)
+		value = sys.byteorder == Binary.BIG_ENDIAN if struct.unpack("<f", string[::-1])[1] else \
+			struct.unpack("<f", string)[1]
+		if accuracy > -1:
+			return round(value, accuracy)
+		else:
+			return value
 
-    @staticmethod
-    def writeLFloat(value):
-        return sys.byteorder == BIG_ENDIAN if struct.pack("f", value)[::-1] else struct.pack("f", value)
+	@staticmethod
+	def writeLFloat(value):
+		return sys.byteorder == Binary.BIG_ENDIAN if struct.pack("<f", value)[::-1] else struct.pack("<f", value)
 
-    @staticmethod
-    def printFloat(value):
-        return re.sub("/(\\.\\d+?)0+/", "1", '%F' % value)
+	@staticmethod
+	def printFloat(value):
+		return re.sub("/(\\.\\d+?)0+$/", "1", '%F' % value)
 
-    def readDouble(self, string):
-        self.checkLength(string, 8)
-        if sys.byteorder == BIG_ENDIAN:
-            return struct.unpack("d", string)[1]
-        else:
-            return struct.unpack("d", string[::-1])[1]
+	@staticmethod
+	def readDouble(string):
+		checkLength(string, 8)
+		if sys.byteorder == Binary.BIG_ENDIAN:
+			return struct.unpack(">d", string)[1]
+		else:
+			return struct.unpack(">d", string[::-1])[1]
 
-    @staticmethod
-    def writeDouble(value):
-        if sys.byteorder == BIG_ENDIAN:
-            return struct.pack("d", value)
-        else:
-            return struct.pack("d", value)[::-1]
+	@staticmethod
+	def writeDouble(value):
+		if sys.byteorder == Binary.BIG_ENDIAN:
+			return struct.pack(">d", value)
+		else:
+			return struct.pack(">d", value)[::-1]
 
-    def readLDouble(self, string):
-        self.checkLength(string, 8)
-        if sys.byteorder == BIG_ENDIAN:
-            return struct.unpack("d", string[::-1])[1]
-        else:
-            return struct.unpack("d", string)[1]
+	@staticmethod
+	def readLDouble(string):
+		checkLength(string, 8)
+		if sys.byteorder == Binary.BIG_ENDIAN:
+			return struct.unpack("<d", string[::-1])[1]
+		else:
+			return struct.unpack("<d", string)[1]
 
-    @staticmethod
-    def writeLDouble(value):
-        if sys.byteorder == BIG_ENDIAN:
-            return struct.pack("d", value)[::-1]
-        else:
-            return struct.pack("d", value)
+	@staticmethod
+	def writeLDouble(value):
+		if sys.byteorder == Binary.BIG_ENDIAN:
+			return struct.pack("<d", value)[::-1]
+		else:
+			return struct.pack("<d", value)
 
-    def readLong(self, x):
-        self.checkLength(x, 8)
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            int_arr = struct.unpack("N*", x)
-            return (int_arr[1] << 32) | int_arr[2]
-        else:
-            value = "0"
-            for i in range(0, 8, 2):
-                value = decimal.Decimal(value) * decimal.Decimal("65536")
-                value = decimal.Decimal(value) + decimal.Decimal(self.readShort(substr(x, i, 2)))
+	@staticmethod
+	def readLong(x):
+		checkLength(x, 8)
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			int_arr = struct.unpack(">L*", x)
+			return (int_arr[1] << 32) | int_arr[2]
+		else:
+			value = "0"
+			for i in range(0, 8, 2):
+				value = decimal.Decimal(value) * decimal.Decimal("65536")
+				value = decimal.Decimal(value) + decimal.Decimal(Binary.readShort(substr(x, i, 2)))
 
-            if value > "9223372036854775807":
-                value = decimal.Decimal(value) + decimal.Decimal("-18446744073709551616")
+			if value > "9223372036854775807":
+				value = decimal.Decimal(value) + decimal.Decimal("-18446744073709551616")
 
-            return value
+			return value
 
-    def writeLong(self, value):
-        if sys.int_info.__getattribute__('sizeof_digit') == 8:
-            return struct.pack("NN", value >> 32, value & 0xFFFFFFFF)
-        else:
-            x = ""
+	@staticmethod
+	def writeLong(value):
+		if sys.int_info.__getattribute__('sizeof_digit') == 8:
+			return struct.pack(">LL", value >> 32, value & 0xFFFFFFFF)
+		else:
+			x = ""
 
-            if value < "0":
-                value = decimal.Decimal(value) + decimal.Decimal("18446744073709551616")
+			if value < "0":
+				value = decimal.Decimal(value) + decimal.Decimal("18446744073709551616")
 
-            x += self.writeShort((decimal.Decimal(value) / decimal.Decimal("281474976710656")) % "65536")
-            x += self.writeShort((decimal.Decimal(value) / decimal.Decimal("4294967296")) % "65536")
-            x += self.writeShort((decimal.Decimal(value) / decimal.Decimal("65536")) % "65536")
-            x += self.writeShort(value % "65536")
+			x += Binary.writeShort((decimal.Decimal(value) / decimal.Decimal("281474976710656")) % "65536")
+			x += Binary.writeShort((decimal.Decimal(value) / decimal.Decimal("4294967296")) % "65536")
+			x += Binary.writeShort((decimal.Decimal(value) / decimal.Decimal("65536")) % "65536")
+			x += Binary.writeShort(value % "65536")
 
-            return x
+			return x
 
-    def readLLong(self, string):
-        return self.readLong(string[::-1])
+	@staticmethod
+	def readLLong(string):
+		return Binary.readLong(string[::-1])
 
-    def writeLLong(self, value):
-        return self.writeLong(value)[::-1]
+	@staticmethod
+	def writeLLong(value):
+		return Binary.writeLong(value)[::-1]
 
-    def readVarInt(self, stream):
-        shift = sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31
-        raw = self.readUnsignedVarInt(stream)
-        temp = (((raw << shift) >> shift) ^ raw) >> 1
-        return temp ^ (raw & (1 << shift))
+	@staticmethod
+	def readVarInt(stream):
+		shift = sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31
+		raw = Binary.readUnsignedVarInt(stream)
+		temp = (((raw << shift) >> shift) ^ raw) >> 1
+		return temp ^ (raw & (1 << shift))
 
-    @staticmethod
-    def readUnsignedVarInt(stream):
-        value = 0
-        b = stream.encode("ascii")
-        for i in range(stream.encode("ascii"), b & 0x80, 7):
-            if i > 63:
-                raise ValueError("Var int did not terminate after 10 bytes!")
-            value |= ((b & 0x7f) << i)
+	@staticmethod
+	def readUnsignedVarInt(stream):
+		value = 0
+		b = stream.encode("ascii")
+		for i in range(stream.encode("ascii"), b & 0x80, 7):
+			if i > 63:
+				raise ValueError("Var int did not terminate after 10 bytes!")
+			value |= ((b & 0x7f) << i)
 
-        return value
+		return value
 
-    def writeVarInt(self, v):
-        return self.writeUnsignedVarInt(
-            (v << 1) ^ (v >> (sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31)))
+	@staticmethod
+	def writeVarInt(v):
+		return Binary.writeUnsignedVarInt(
+				(v << 1) ^ (v >> (sys.int_info.__getattribute__('sizeof_digit') == 8 if 63 else 31)))
 
-    @staticmethod
-    def writeUnsignedVarInt(value):
-        buf = ""
-        for i in range(0, 10):
-            if (value >> 7) != 0:
-                buf += chr(value | 0x80)
-            else:
-                buf += chr(value & 0x7f)
-                return buf
+	@staticmethod
+	def writeUnsignedVarInt(value):
+		buf = ""
+		for i in range(0, 10):
+			if (value >> 7) != 0:
+				buf += chr(value | 0x80)
+			else:
+				buf += chr(value & 0x7f)
+				return buf
 
-            value = ((value >> 7) & (PYTHON_INT_MAX >> 6))
+			value = ((value >> 7) & (sys.maxsize >> 6))
 
-        raise ValueError("Value too large to be encoded as a var int")
+		raise ValueError("Value too large to be encoded as a var int")

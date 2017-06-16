@@ -1,2 +1,4 @@
+# -*- coding: utf-8 -*-
 class Entity:
-    pass
+	def getId(self):
+		pass

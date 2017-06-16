@@ -1,22 +1,29 @@
+# -*- coding: utf-8 -*-
+from abc import *
 
-class Tag:
-    value = None
+from pymine.nbt.NBT import NBT
 
-    def getValue(self):
-        return self.value
 
-    def getType(self):
-        pass
+class Tag(metaclass = ABCMeta):
+	value = None
 
-    def setValue(self, value):
-        self.value = value
+	def getValue(self):
+		return self.value
 
-    def write(self, nbt, network=False):
-        pass
+	@abstractmethod
+	def getType(self):
+		pass
 
-    def read(self, nbt, network=False):
-        pass
+	def setValue(self, value):
+		self.value = value
 
-    def __toString(self):
-        return str(self.value)
-        return str(self.value)
+	@abstractmethod
+	def write(self, nbt: NBT, network: bool = False):
+		pass
+
+	@abstractmethod
+	def read(self, nbt: NBT, network: bool = False):
+		pass
+
+	def __str__(self):
+		return str(self.value)
