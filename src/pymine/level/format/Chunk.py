@@ -502,7 +502,7 @@ class Chunk:
 		"""
 		self.terrainGenerated = value
 
-	def addEntity(self, entity:Entity):
+	def addEntity(self, entity: Entity):
 		"""
 
 		:param Entity entity:
@@ -510,9 +510,9 @@ class Chunk:
 		"""
 		self.entities[entity.getId()] = entity
 		if not isinstance(entity, Player) and self.isInit:
-			self.hasChanged =True
+			self.hasChanged = True
 
-	def removeEntity(self, entity:Entity):
+	def removeEntity(self, entity: Entity):
 		"""
 
 		:param Entity entity:
@@ -520,20 +520,19 @@ class Chunk:
 		"""
 		del self.entities[entity.getId()]
 		if not isinstance(entity, Player) and self.isInit:
-			self.hasChanged =True
+			self.hasChanged = True
 
-	def addTile(self, tile:Tile):
+	def addTile(self, tile: Tile):
 		"""
 
-		:param Tile entity:
+		:param Tile tile:
 		:return:
 		"""
 		self.tiles[tile.getId()] = tile
 		index = ((tile.x & 0x0f) << 12) | ((tile.z & 0x0f) << 8) | (tile.y & 0xff)])
 		if isset(self.tileList[index])
 		if self.isInit:
-			self.hasChanged =True
-
+			self.hasChanged = True
 
 	def getSubChunk(self, y: int, generateNew: bool = False) -> SubChunk:
 		"""
