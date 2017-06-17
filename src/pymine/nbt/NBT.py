@@ -1,22 +1,26 @@
 # coding=utf-8
 import zlib
-from typing import Callable
 
-from pymine.item.Item import ShortTag
+from pymine.nbt.tag.ShortTag import ShortTag
 from pymine.nbt.tag.ByteArrayTag import ByteArrayTag
 from pymine.nbt.tag.ByteTag import ByteTag
 from pymine.nbt.tag.CompoundTag import CompoundTag
 from pymine.nbt.tag.DoubleTag import DoubleTag
 from pymine.nbt.tag.EndTag import EndTag
+from pymine.nbt.tag.FloatTag import FloatTag
+from pymine.nbt.tag.IntArrayTag import IntArrayTag
+from pymine.nbt.tag.IntTag import IntTag
 from pymine.nbt.tag.ListTag import ListTag
+from pymine.nbt.tag.LongTag import LongTag
 from pymine.nbt.tag.NamedTag import NamedTag
 from pymine.nbt.tag.StringTag import StringTag
 from pymine.nbt.tag.Tag import Tag
+
 from spl.stubs.Core import isset, is_array, is_numeric
 from src.pymine.utils.Binary import *
 
 
-class NBT:
+class NBT(object):
     LITTLE_ENDIAN = 0,
     BIG_ENDIAN = 1
     TAG_End = 0
@@ -81,7 +85,7 @@ class NBT:
     @staticmethod
     def parseJSON(data, offset=0):
         length = len(data)
-        while offset < length:
+        for i in range(offset < length):
             c = data[offset]
             if c == "{":
                 offset += 1
@@ -89,50 +93,274 @@ class NBT:
                 return CompoundTag("", data)
             elif c != " " and c != "\r" and c != "\n" and c != "\t":
                 raise Exception("Syntax error: unexpected '{' at offset {".format(c, offset))
-            offset += 1
         return None
 
-    @staticmethod  # TODO: chua xong
+    @staticmethod
     def parseList(string, offset=0):
         length = len(string)
 
         key = 0
         value = None
 
-        data = {
+        data = {}
 
-        while offset < length:
+        for i in range(offset < length):
             if string[offset - 1] == "":
                 break
             elif string[offset] == "":
                 offset += 1
                 break
-            tagType = None
+            tagType = NBT.readTagType(string, offset)
             value = NBT.readValue(string, offset, tagType)
 
             if tagType == NBT.TAG_Byte:
                 data[key] = ByteTag(key, value)
+            elif tagType == NBT.TAG_Short:
+                data[key] = ShortTag(key, value)
+            elif tagType == NBT.TAG_Int:
+                data[key] = IntTag(key, value)
+            elif tagType == NBT.TAG_Long:
+                data[key] = LongTag(key, value)
+            elif tagType == NBT.TAG_Float:
+                data[key] = FloatTag(key, value)
+            elif tagType == NBT.TAG_Double:
+                data[key] = DoubleTag(key, value)
+            elif tagType == NBT.TAG_ByteArray:
+                data[key] = ByteArrayTag(key, value)
+            elif tagType == NBT.TAG_String:
+                data[key] = StringTag(key, value)
+            elif tagType == NBT.TAG_List:
+                data[key] = ListTag(key, value)
+            elif tagType == NBT.TAG_Compound:
+                data[key] = CompoundTag(key, value)
+            elif tagType == NBT.TAG_IntArray:
+                data[key] = IntArrayTag(key, value)
+
+            key += 1
+        return data
+
+    @staticmethod
+    def parseCompound(string, offset=0):
+        length = len(string)
+
+        data = {}
+
+        while offset < length:
+            if string[offset - 1] == "}":
+                break
+            elif string[offset] == "}":
+                offset += 1
+                break
+
+            tagType = NBT.readTagType(string, offset)
+            key = NBT.readKey(string, offset)
+            value = NBT.readValue(string, offset, tagType)
+
+            if tagType == NBT.TAG_Byte:
+                data[key] = ByteTag(key, value)
+            elif tagType == NBT.TAG_Short:
+                data[key] = ShortTag(key, value)
+            elif tagType == NBT.TAG_Int:
+                data[key] = IntTag(key, value)
+            elif tagType == NBT.TAG_Long:
+                data[key] = LongTag(key, value)
+            elif tagType == NBT.TAG_Float:
+                data[key] = FloatTag(key, value)
+            elif tagType == NBT.TAG_Double:
+                data[key] = DoubleTag(key, value)
+            elif tagType == NBT.TAG_ByteArray:
+                data[key] = ByteArrayTag(key, value)
+            elif tagType == NBT.TAG_String:
+                data[key] = StringTag(key, value)
+            elif tagType == NBT.TAG_List:
+                data[key] = ListTag(key, value)
+            elif tagType == NBT.TAG_Compound:
+                data[key] = CompoundTag(key, value)
+            elif tagType == NBT.TAG_IntArray:
+                data[key] = IntArrayTag(key, value)
 
             offset += 1
 
-    @staticmethod  # TODO: chua xong
-    def parseCompound(string, offset=0):
-        pass
+        return data
 
-    @staticmethod  # TODO: chua xong
+    @staticmethod
+    def readTagType(data, offset):
+        value = ""
+        tagType = None
+        inQuotes = False
+
+        length = len(data)
+        for i in range(offset < length):
+            c = data[offset]
+
+            if not inQuotes and (c == " " or c == "\r" or c == "\n" or c == "\t" or c == "," or c == "}" or c == "]"):
+                if c == "," or c == "}" or c == "]":
+                    break
+            elif c == '"':
+                inQuotes = not inQuotes
+                if tagType is None:
+                    tagType = NBT.TAG_String
+                elif inQuotes:
+                    raise Exception("Syntax error: invalid quote at offset {}".format(offset))
+            elif c == "\\":
+                value += data[offset + 1] if data[offset + 1] else ""
+                offset += 1
+            elif c == "{" and not inQuotes:
+                if value != "":
+                    raise Exception("Syntax error: invalid compound start at offset {}".format(offset))
+                offset += 1
+                value = NBT.parseCompound(data, offset)
+                tagType = NBT.TAG_Compound
+                break
+            elif c == "[" and not inQuotes:
+                if value != "":
+                    raise Exception("Syntax error: invalid list start at offset {}".format(offset))
+                offset += 1
+                value = NBT.parseList(data, offset)
+                tagType = NBT.TAG_List
+                break
+            else:
+                value += c
+        if value == "":
+            raise Exception("Syntax error: invalid empty value at offset {}".format(offset))
+
+        if tagType is None and len(value) > 0:
+            value = value.strip()
+            last = str.lower(substr(value, -1))
+            part = substr(value, 0, -1)
+
+            if last != "b" and last != "s" and last != "l" and last != "f" and last != "d":
+                part = value
+                last = None
+            if last != "f" and last != "d" and str(int(part) == part):
+                if last == "b":
+                    tagType = NBT.TAG_Byte
+                elif last == "s":
+                    tagType = NBT.TAG_Short
+                elif last == "l":
+                    tagType = NBT.TAG_Long
+                else:
+                    tagType = NBT.TAG_Int
+            elif part.isnumeric():
+                if last == "f" and last == "d" and ("." in part) is not False:
+                    if last == "f":
+                        tagType = NBT.TAG_Float
+                    if last == "d":
+                        tagType = NBT.TAG_Double
+                    else:
+                        tagType = NBT.TAG_Float
+                else:
+                    if last == "l":
+                        tagType = NBT.TAG_Long
+                    else:
+                        tagType = NBT.TAG_Int
+            else:
+                tagType = NBT.TAG_String
+
+        return tagType
+
+    @staticmethod
     def readValue(data, offset, tagType=None):
-        pass
+        value = ""
+        tagType = None
+        inQuotes = False
 
-    @staticmethod  # TODO: chua xong
+        length = len(data)
+        for i in range(offset < length):
+            c = data[offset]
+
+            if not inQuotes and (c == " " or c == "\r" or c == "\n" or c == "\t" or c == "," or c == "}" or c == "]"):
+                if c == "," or c == "}" or c == "]":
+                    break
+            elif c == '"':
+                inQuotes = not inQuotes
+                if tagType is None:
+                    tagType = NBT.TAG_String
+                elif inQuotes:
+                    raise Exception("Syntax error: invalid quote at offset {}".format(offset))
+            elif c == "\\":
+                value += data[offset + 1] if data[offset + 1] else ""
+                offset += 1
+            elif c == "{" and not inQuotes:
+                if value != "":
+                    raise Exception("Syntax error: invalid compound start at offset {}".format(offset))
+                offset += 1
+                value = NBT.parseCompound(data, offset)
+                tagType = NBT.TAG_Compound
+                break
+            elif c == "[" and not inQuotes:
+                if value != "":
+                    raise Exception("Syntax error: invalid list start at offset {}".format(offset))
+                offset += 1
+                value = NBT.parseList(data, offset)
+                tagType = NBT.TAG_List
+                break
+            else:
+                value += c
+        if value == "":
+            raise Exception("Syntax error: invalid empty value at offset {}".format(offset))
+
+        if tagType is None and len(value) > 0:
+            value = value.strip()
+            last = str.lower(substr(value, -1))
+            part = substr(value, 0, -1)
+
+            if last != "b" and last != "s" and last != "l" and last != "f" and last != "d":
+                part = value
+                last = None
+            if last != "f" and last != "d" and str(int(part) == part):
+                if last == "b":
+                    tagType = NBT.TAG_Byte
+                elif last == "s":
+                    tagType = NBT.TAG_Short
+                elif last == "l":
+                    tagType = NBT.TAG_Long
+                else:
+                    tagType = NBT.TAG_Int
+                value = int(part)
+            elif part.isnumeric():
+                if last == "f" and last == "d" and ("." in part) is not False:
+                    if last == "f":
+                        tagType = NBT.TAG_Float
+                    if last == "d":
+                        tagType = NBT.TAG_Double
+                    else:
+                        tagType = NBT.TAG_Float
+                    value = float(part)
+                else:
+                    if last == "l":
+                        tagType = NBT.TAG_Long
+                    else:
+                        tagType = NBT.TAG_Int
+                    value = part
+            else:
+                tagType = NBT.TAG_String
+
+        return value
+
+    @staticmethod
     def readKey(data, offset):
-        pass
+        key = ""
+
+        length = len(data)
+        for i in range(offset < length):
+            c = data[offset]
+
+            if c == ":":
+                offset += 1
+                break
+            elif c != " " and c != "\r" and c != "\n" and c != "\t" and c != "\"":
+                key += c
+        if key == "":
+            raise Exception("Syntax error: invalid empty key at offset {}".format(offset))
+        return key
 
     def get(self, length):
         if length < 0:
             self.offset = length(self.buffer) - 1
             return ""
         elif length:
-            return self.buffer[self.offset:self.offset]
+            return self.buffer[self.offset, self.offset]
         self.offset += length
         return length == 1 if self.buffer[self.offset + 1] else self.buffer[(self.offset - length), length]
 
@@ -154,7 +382,8 @@ class NBT:
             self.data = [self.data]
             while True:
                 self.data.append(self.readTag(network))
-                if self.offset < len(self.buffer): break
+                if self.offset < len(self.buffer):
+                    break
             self.buffer = ''
 
     def readCompressed(self, buffer):
@@ -298,20 +527,19 @@ class NBT:
         self.buffer += v
 
     def getArray(self):
-        data = []
+        data = {}
         self.toArray(data, self.data)
         return data
 
     @staticmethod
-    def toArray(data: list, tag: list):
-
+    def toArray(data, tag):
         """
-        :param list data:
-        :param CompoundTag[] | ListTag[] | IntArrayTag[] tag:
+        :param data:
+        :param dict | CompoundTag | ListTag | IntArrayTag tag: CompoundTag[] | ListTag[] | IntArrayTag[]
         """
         for key, value in tag:
             if isinstance(value, CompoundTag) or isinstance(value, ListTag) or isinstance(value, IntArrayTag):
-                data[key] = []
+                data[key] = {}
                 NBT.toArray(data[key], value)
             else:
                 data[key] = value.getValue()
@@ -329,7 +557,7 @@ class NBT:
         return None
 
     @staticmethod
-    def fromArray(tag: Tag, data=dict, func):
+    def fromArray(func, tag, data):
         for key, value in data:
             if is_array(value):
                 isNumeric = True
@@ -342,46 +570,29 @@ class NBT:
                         isIntArray = False
 
                 tag[key] = isNumeric is True if (
-                isIntArray is True if IntArrayTag(key, []) else ListTag(key, [])) else CompoundTag(key, [])
-                NBT.fromArray(tag[key], value, guesser)
+                    isIntArray is True if IntArrayTag(key, {}) else ListTag(key, {})) else CompoundTag(key, {})
+                NBT.fromArray(func, tag[key], value)
             else:
-                v = guesser(key, value)
+                v = func(key, value)
                 if isinstance(v, Tag):
                     tag[key] = v
 
+    def setArray(self, data: dict, func=None):
+        self.data = CompoundTag("", {})
+        self.fromArray(self.data, data, func is None if [self, "fromArrayGuesser"] else func)
 
-def setArray(array data, callable
+    def getData(self):
+        """
 
+        :return: data
+        :rtype: CompoundTag|dict
+        """
+        return self.data
 
-guesser = null){
-    self.data = new
-CompoundTag("", [])
-self.
-    fromArray(self.data, data, guesser == null if [self.
+    def setData(self, data):
+        """
 
-
-class , "fromArrayGuesser"]:
-
-
-    guesser
-
-)
-
-/ **
-* @ return CompoundTag | array
-* /
-def getData()
-
-
-    {
-
-
-return self.data
-
-/ **
-* @ param
-CompoundTag | array
-data
-* /
-def setData(data){
-    self.data = data
+        :param CompoundTag | dict data:
+        :return:
+        """
+        self.data = data

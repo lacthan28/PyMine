@@ -11,6 +11,7 @@ import urllib.request
 
 import time
 import math
+import struct
 
 
 def microtime(get_as_float=False):
@@ -153,3 +154,25 @@ class ArrayAccess(object):
 class Countable(object):
     def __len__(self, mode=2):
         pass
+
+
+class stdClass(object):
+    pass
+
+
+def unpack(fmt, astr):
+    """
+    Return struct.unpack(fmt, astr) with the optional single * in fmt replaced with
+    the appropriate number, given the length of astr.
+    """
+    # http://stackoverflow.com/a/7867892/190597
+    try:
+        return struct.unpack(fmt, astr)
+    except struct.error:
+        flen = struct.calcsize(fmt.replace('*', ''))
+        alen = len(astr)
+        idx = fmt.find('*')
+        before_char = fmt[idx - 1]
+        n = (alen - flen) / struct.calcsize(before_char) + 1
+        fmt = ''.join((fmt[:idx - 1], str(n), before_char, fmt[idx + 1:]))
+        return struct.unpack(fmt, astr)

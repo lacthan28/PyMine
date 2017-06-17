@@ -2,9 +2,10 @@
 from abc import *
 
 from pymine.nbt.NBT import NBT
+from spl.stubs.Core import stdClass
 
 
-class Tag(metaclass=ABCMeta, object):
+class Tag(metaclass=ABCMeta, stdClass):
     value = None
 
     def getValue(self):
