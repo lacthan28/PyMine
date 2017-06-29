@@ -1,99 +1,127 @@
+# -*- coding: utf-8 -*-
+import linecache
+import logging
+
 from .TextFormat import *
 from ...spl.LogLevel import *
 from ..Thread import *
 from ..Worker import *
 from ...spl.AttachableThreadedLogger import *
-from ...spl.stubs.core_c import *
-from ...spl.stubs.core_d import *
 from os import *
 from re import *
+from threading import Thread, current_thread
+import traceback
+from pymine.PyMine import *
 
-logger = None
-
-def isset(variable):
-	return variable in locals() or variable in globals()
 
 class MainLogger(AttachableThreadedLogger):
-    logFile, logStream, shutdown, logDebug, logResource = None
+	logFile = None
+	logStream = None
+	isShutdown = None
+	logDebug = None
+	logResource = None
 
-    def __init__(self, logFile, logDebug=False):
-        global logger
-        if isinstance(logger, MainLogger):
-            raise RuntimeError("MainLogger has been already created")
+	logger = None
 
-        logger = self
-        utime(self.logFile)
-        self.logFile = logFile
-        self.logDebug = logDebug
-        self.logStream = Threaded()
-        self.start()
+	def __init__(self, logFile, logDebug = False):
+		if isinstance(self.logger, MainLogger):
+			raise RuntimeError("MainLogger has been already created")
 
-    def getLogger(self):
-        return logger
+		self.logger = self
+		utime(self.logFile)
+		self.logFile = logFile
+		self.logDebug = logDebug
+		self.logStream = Thread()
+		self.start()
 
-    def emergency(self, message):
-        self.send(message, LogLevel.EMERGENCY, "EMERGENCY", TextFormat.RED)
+	def getLogger(self):
+		return self.logger
 
-    def alert(self, message):
-        self.send(message, LogLevel.ALERT, "ALERT", TextFormat.RED)
+	def critical(self, message, **kwargs):
+		self.send(message, LogLevel.CRITICAL, "CRITICAL", TextFormat.RED)
 
-    def critical(self, message):
-        self.send(message, LogLevel.CRITICAL, "CRITICAL", TextFormat.RED)
+	def error(self, message, **kwargs):
+		self.send(message, LogLevel.ERROR, "ERROR", TextFormat.DARK_RED)
 
-    def error(self, message):
-        self.send(message, LogLevel.ERROR, "ERROR", TextFormat.DARK_RED)
+	def warning(self, message, **kwargs):
+		self.send(message, LogLevel.WARNING, "WARNING", TextFormat.YELLOW)
 
-    def warning(self, message):
-        self.send(message, LogLevel.WARNING, "WARNING", TextFormat.YELLOW)
+	def info(self, message, **kwargs):
+		self.send(message, LogLevel.INFO, "INFO", TextFormat.WHITE)
 
-    def notice(self, message):
-        self.send(message, LogLevel.NOTICE, "NOTICE", TextFormat.AQUA)
+	def debug(self, message, **kwargs):
+		if not self.logDebug:
+			return
+		self.send(message, LogLevel.DEBUG, "DEBUG", TextFormat.GRAY)
 
-    def info(self, message):
-        self.send(message, LogLevel.INFO, "INFO", TextFormat.WHITE)
+	def setLogDebug(self, logDebug):
+		self.logDebug = bool(logDebug)
 
-    def debug(self, message):
-        if self.logDebug == False:
-            return
-        self.send(message, LogLevel.DEBUG, "DEBUG", TextFormat.GRAY)
+	def logException(self, e: BaseException, trace = None):
+		_type, _value, _tb = sys.exc_info()
+		if trace is None:
+			trace = traceback.TracebackException(_type, _value, _tb)
 
-    def setLogDebug(self, logDebug):
-        self.logDebug = bool(logDebug)
+		errstr = e
+		errfile = trace.filename
+		errnum = logging.getLogger().level
+		errline = trace.lineno
 
-    def logException(self, e: Throwable, trace=None):
-        if trace == None:
-            trace = e.getTrace()
+		errorConversion = {
+			logging.CRITICAL: "CRITICAL",
+			logging.ERROR:    "ERROR",
+			logging.WARNING:  "WARNING",
+			logging.INFO:     "INFO",
+			logging.DEBUG:    "DEBUG",
+			logging.NOTSET:   "NOTSET",
+			}
+		if errnum == 0:
+			_type = 'notset'
+		else:
+			if errnum == LogLevel.CRITICAL:
+				_type = 'critical'
+			elif errnum == LogLevel.WARNING:
+				_type = 'warning'
+			elif errnum == LogLevel.ERROR:
+				_type = 'error'
+			elif errnum == LogLevel.INFO:
+				_type = 'info'
+			elif errnum == LogLevel.DEBUG:
+				_type = 'debug'
 
-        errstr = e.getMessage()
-        errfile =e.getFile()
-        errno = e.getCode()
-        errline = e.getLine()
+		errnum = isset(errorConversion[errnum]) if errorConversion[errnum] else errnum
+		errstr = sub('/\s+/', ' ', str(errstr).trip())
+		errfile = PyMine.cleanPath(errfile)
+		self.log(_type, type(e).__name__ + ": {} ({}) in {} at line {}".format(errstr, errno, errfile, errline))
 
-        errorConversion = {0: "EXCEPTION",
-                           E_ERROR: "E_ERROR",
-                           E_WARNING: "E_WARNING",
-                           E_PARSE: "E_PARSE",
-                           E_NOTICE: "E_NOTICE",
-                           E_CORE_ERROR: "E_CORE_ERROR",
-                           E_CORE_WARNING: "E_CORE_WARNING",
-                           E_COMPILE_ERROR: "E_COMPILE_ERROR",
-                           E_COMPILE_WARNING: "E_COMPILE_WARNING",
-                           E_USER_ERROR: "E_USER_ERROR",
-                           E_USER_WARNING: "E_USER_WARNING",
-                           E_USER_NOTICE: "E_USER_NOTICE",
-                           E_STRICT: "E_STRICT",
-                           E_RECOVERABLE_ERROR: "E_RECOVERABLE_ERROR",
-                           E_DEPRECATED: "E_DEPRECATED",
-                           E_USER_DEPRECATED: "E_USER_DEPRECATED",
-                           };
-        if errno == 0:
-            type = LogLevel.CRITICAL
-        else:
-            type = (errno == E_ERROR or errno == E_USER_ERROR) if LogLevel.ERROR else ((errno == E_USER_WARNING or errno == E_WARNING) if LogLevel.WARNING else LogLevel.NOTICE)
-        errno = isset(errorConversion[errno]) if errorConversion[errno] else errno
-        errstr = sub('/\s+/', ' ', str(errstr).trip())
-        errfile= pymine\cleanPath(errfile)
+		for i, line in PyMine.getTrace(0, trace):
+			self.debug(line)
+	def log(self, level, message, **kwargs):
+		if level == LogLevel.CRITICAL:
+			self.critical(message)
+		elif level == LogLevel.WARNING:
+			self.warning(message)
+		elif level == LogLevel.ERROR:
+			self.error(message)
+		elif level == LogLevel.INFO:
+			self.info(message)
+		elif level == LogLevel.DEBUG:
+			self.debug(message)
 
+	def shutdown(self):
+		self.isShutdown = True
 
-        def send(self, message, level, param, color):
-            pass
+	def send(self, message, level, prefix, color):
+		now = time.time()
+		thread = current_thread()
+		if thread is None:
+			threadName = "Server thread"
+		elif isinstance(thread, Thread) or isinstance(thread, Worker):
+			threadName = thread.getThreadName() + " thread"
+		else:
+			threadName = thread.name  + " thread"
+
+		message = TextFormat.toANSI(TextFormat.AQUA + "[{}]".format(date(now)) + TextFormat.RESET + color + "[{}/{}]:".format(threadName, prefix) + " " + message + TextFormat.RESET)
+		cleanMessage = TextFormat.clean(message)
+
+		if not Terminal

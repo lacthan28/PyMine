@@ -1,16 +1,8 @@
+# -*- coding: utf-8 -*-
 class LogLevel:
-    EMERGENCY = "emergency"
-
-    ALERT = "alert"
-
-    CRITICAL = "critical"
-
-    ERROR = "error"
-
-    WARNING = "warning"
-
-    NOTICE = "notice"
-
-    INFO = "info"
-
-    DEBUG = "debug"
+	CRITICAL = 50
+	ERROR = 40
+	WARNING = 30
+	INFO = 20
+	DEBUG = 10
+	NOTSET = 0

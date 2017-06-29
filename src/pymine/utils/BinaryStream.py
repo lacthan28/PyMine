@@ -2,10 +2,10 @@
 from pymine.item.Item import Item
 from pymine.utils.Binary import Binary
 from pymine.utils.UUID import *
-from spl.stubs.Core import substr, isset
+from spl.stubs.Core import substr, isset, stdClass
 
 
-class BinaryStream:
+class BinaryStream(stdClass):
 	offset = None
 	buffer = None
 

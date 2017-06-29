@@ -1,11 +1,7 @@
 # coding=utf-8
+import logging
 
-
-class ABCX:
-	pass
-
-def getName(abc:ABCX):
-	print(type(abc).__name__)
-
-abc = ABCX()
-getName(abc)
+try:
+	print(1/0)
+except BaseException as e:
+	print(logging.exception(e))

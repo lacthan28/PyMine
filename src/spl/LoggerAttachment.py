@@ -1,2 +1,3 @@
+# -*- coding: utf-8 -*-
 class LoggerAttachment:
-    def log(self, level, message): pass
+	def log(self, level, message): pass
