@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta
 
+from pymine.plugin.PluginDescription import PluginDescription
 from ..command.CommandExecutor import *
 
 
@@ -37,7 +38,7 @@ class Plugin(metaclass = ABCMeta, CommandExecutor):
 		:return:
 		"""
 
-	def getDescription(self):
+	def getDescription(self) -> PluginDescription:
 		"""
 		:rtype: PluginDescription
 		:return: PluginDescription

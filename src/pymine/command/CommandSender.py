@@ -1,9 +1,8 @@
 # coding=utf-8
 from ..permission.Permissible import *
-from interface import *
 
 
-class CommandSender(Interface, Permissible):
+class CommandSender(metaclass=ABCMeta, Permissible):
     def sendMessage(self, message): pass
 
     def getServer(self): pass

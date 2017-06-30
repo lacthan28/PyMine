@@ -17,5 +17,7 @@ class Player:
 
 	CRAFTING_ENCHANT = 3
 
+	interface = None
+
 	def dataPacket(self, packet: DataPacket):
 		pass

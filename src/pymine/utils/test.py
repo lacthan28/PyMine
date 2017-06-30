@@ -1,7 +1,5 @@
 # coding=utf-8
-import logging
 
-try:
-	print(1/0)
-except BaseException as e:
-	print(logging.exception(e))
+import sys
+after = [str(m) for m in sys.modules]
+print(after)

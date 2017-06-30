@@ -1,136 +1,118 @@
 # coding=utf-8
-from abc import *
-from copy import *
-
-from ..event.TimingsHandler import *
+from pymine.event.TextContainer import TextContainer
 from .CommandSender import *
 from .ConsoleCommandSender import *
 from ..Server import *
 from ..command.CommandMap import *
+from ..event.TimingsHandler import *
 from ..event.TranslationContainer import *
 from ..utils.TextFormat import *
+from copy import copy
 
 
 class Command(metaclass = ABCMeta):
 	"""
-	:param dict defaultDataTemplate:
-	:param str name:
-	:param dict commandData:
-	:param str nextLabel:
-	:param str label:
-	:param list aliases:
-	:param list activeAliases:
-	:param CommandMap commandMap:
-	:param str description:
-	:param str usageMessage:
-	:param str permissionMessage:
+	:param dict __defaultDataTemplate:
+	:param str __name:
+	:param dict _commandData:
+	:param str __nextLabel:
+	:param str __label:
+	:param dict __aliases:
+	:param dict __activeAliases:
+	:param CommandMap __commandMap:
+	:param str _description:
+	:param str _usageMessage:
+	:param str __permissionMessage:
 	:param TimingsHandler timings:
 	"""
 
-	defaultDataTemplate = None
-
-	name = None
-
-	commandData = { }
-
-	nextLabel = None
-
-	label = None
-
-	aliases = []
-
-	activeAliases = []
-
-	commandMap = None
-
-	description = ""
-
-	usageMessage = None
-
-	permissionMessage = None
-
+	__defaultDataTemplate = None
+	__name = None
+	_commandData = { }
+	__nextLabel = None
+	__label = None
+	__aliases = {}
+	__activeAliases = {}
+	__commandMap = None
+	_description = ""
+	_usageMessage = None
+	__permissionMessage = None
 	timings = None
 
-	def __init__(self, name, description = "", usageMessage = None, aliases = None):
+	def __init__(self, name, description = "", usageMessage = None, aliases:dict = {}):
 		"""
 
 		:param str name:
 		:param str description:
 		:param str usageMessage:
-		:param list aliases: str[]
+		:param dict aliases: str[]
 		"""
-		if aliases is None:
-			aliases = []
-		self.commandData = self.generateDefaultData()
-		self.name = self.nextLabel = self.label = name
+		self._commandData = self.generateDefaultData()
+		self.__name = self.__nextLabel = self.__label = name
 		self.setDescription(description)
-		self.usageMessage = usageMessage is None if "/" + name else usageMessage
+		self._usageMessage = usageMessage is None if "/" + name else usageMessage
 		self.setAliases(aliases)
 		self.timings = TimingsHandler("** Command: " + name)
 
-	"""
-	* Returns an array containing command data
-	*
-	* @return array
-	"""
-
-	def getDefaultCommandData(self) -> list:
-		return self.commandData
-
-	"""
-	* Generates modified command data for the specified player for AvailableCommandsPacket.
-	*
-	* @param Player player
-	*
-	* @return array
-	"""
+	def getDefaultCommandData(self) -> dict:
+		"""
+		* Returns an array containing command data
+		*
+		* :return: dict
+		"""
+		return self._commandData
 
 	def generateCustomCommandData(self, player: Player):
-		customData = self.commandData
+		"""
+			* Generates modified command data for the specified player for AvailableCommandsPacket.
+			*
+			* :param Player player:
+			*
+			* :return: dict
+			"""
+		customData = self._commandData
 		customData["aliases"] = self.getAliases()
+		for overloadName, overload in customData['overloads']:
+			if isset(overload['pyminePermission']) and not player.hasPermission(overload['pyminePermission']):
+				del customData['overloads'][overloadName]
 		return customData
 
-	"""
-	* @return array
-	"""
+	def getOverloads(self) -> dict:
+		return self._commandData["overloads"]
 
-	def getOverloads(self) -> list:
-		return self.commandData["overloads"]
 
-	"""
-	:param CommandSender sender
-	:param string commandLabel
-	:param string[] args
-	*
-	:return mixed
-	"""
 
 	@abstractmethod
-	def execute(self, sender: CommandSender, commandLabel, args: list):
-		pass
-
-	"""
-	:return string
-	"""
+	def execute(self, sender: CommandSender, commandLabel, args: dict):
+		"""
+			:param CommandSender sender:
+			:param str commandLabel:
+			:param dict args:
+			:return: mixed
+			"""
 
 	def getName(self):
-		return self.name
+		"""
+
+		:return: str
+		"""
+		return self.__name
 
 	def getPermission(self):
 		"""
 		:rtype: str
 		:return:
 		"""
-		return isset(self.commandData[int("pyminePermission")]) if self.commandData["pyminePermission"] else None
+		return isset(self._commandData[int("pyminePermission")]) if self._commandData["pyminePermission"] else None
 
 	def setPermission(self, permission):
 		"""
 		:param str | None permission:
 		"""
 		if permission is not None:
-			self.commandData["pyminePermission"] = permission
+			self._commandData["pyminePermission"] = permission
 		else:
-			del self.commandData["pyminePermission"]
+			del self._commandData["pyminePermission"]
 
 	def testPermission(self, target: CommandSender):
 		"""
@@ -140,10 +122,10 @@ class Command(metaclass = ABCMeta):
 		if self.testPermissionSilent(target):
 			return True
 
-		if self.permissionMessage is None:
+		if self.__permissionMessage is None:
 			target.sendMessage(TranslationContainer(TextFormat.RED + "%commands.generic.permission"))
-		elif self.permissionMessage != "":
-			target.sendMessage(str_replace("<permission>", self.getPermission(), self.permissionMessage))
+		elif self.__permissionMessage != "":
+			target.sendMessage(str_replace("<permission>", self.getPermission(), self.__permissionMessage))
 
 		return False
 
@@ -167,13 +149,13 @@ class Command(metaclass = ABCMeta):
 		:rtype: string
 		:return: label
 		"""
-		return self.label
+		return self.__label
 
 	def setLabel(self, name):
-		self.nextLabel = name
+		self.__nextLabel = name
 		if not self.isRegistered():
 			self.timings = TimingsHandler("** Command: " + name)
-			self.label = name
+			self.__label = name
 
 			return True
 
@@ -188,7 +170,7 @@ class Command(metaclass = ABCMeta):
 		:rtype: bool
 		"""
 		if self.allowChangesFrom(commandMap):
-			self.commandMap = commandMap
+			self.__commandMap = commandMap
 
 			return True
 
@@ -201,10 +183,10 @@ class Command(metaclass = ABCMeta):
 	"""
 
 	def unregister(self, commandMap: CommandMap):
-		if (self.allowChangesFrom(commandMap)):
-			self.commandMap = None
-			self.activeAliases = self.commandData["aliases"]
-			self.label = self.nextLabel
+		if self.allowChangesFrom(commandMap):
+			self.__commandMap = None
+			self.__activeAliases = self._commandData["aliases"]
+			self.__label = self.__nextLabel
 
 			return True
 
@@ -217,52 +199,52 @@ class Command(metaclass = ABCMeta):
 	"""
 
 	def allowChangesFrom(self, commandMap: CommandMap):
-		return self.commandMap == None or self.commandMap == commandMap
+		return self.__commandMap is None or self.__commandMap == commandMap
 
 	"""
 	:return bool
 	"""
 
 	def isRegistered(self):
-		return self.commandMap is not None
+		return self.__commandMap is not None
 
 	"""
 	:return string[]
 	"""
 
 	def getAliases(self):
-		return self.activeAliases
+		return self.__activeAliases
 
 	"""
 	:return string
 	"""
 
 	def getPermissionMessage(self):
-		return self.permissionMessage
+		return self.__permissionMessage
 
 	"""
 	:return string
 	"""
 
 	def getDescription(self):
-		return self.commandData["description"]
+		return self._commandData["description"]
 
 	"""
 	:return string
 	"""
 
 	def getUsage(self):
-		return self.usageMessage
+		return self._usageMessage
 
 	"""
 	:param
 	string[] aliases
 			  """
 
-	def setAliases(self, aliases: list):
-		self.commandData["aliases"] = aliases
+	def setAliases(self, aliases: dict):
+		self._commandData["aliases"] = aliases
 		if not (self.isRegistered()):
-			self.activeAliases = aliases
+			self.__activeAliases = aliases
 
 	"""
 	:param
@@ -270,7 +252,7 @@ class Command(metaclass = ABCMeta):
 			"""
 
 	def setDescription(self, description):
-		self.commandData["description"] = description
+		self._commandData["description"] = description
 
 	"""
 	:param
@@ -278,7 +260,7 @@ class Command(metaclass = ABCMeta):
 			"""
 
 	def setPermissionMessage(self, permissionMessage):
-		self.permissionMessage = permissionMessage
+		self.__permissionMessage = permissionMessage
 
 	"""
 	:param
@@ -286,18 +268,18 @@ class Command(metaclass = ABCMeta):
 			"""
 
 	def setUsage(self, usage):
-		self.usageMessage = usage
+		self._usageMessage = usage
 
 	"""
 	:return array
 	"""
 
-	def generateDefaultData(self) -> list:
-		if self.defaultDataTemplate is None:
-			self.defaultDataTemplate = json.loads(
+	def generateDefaultData(self) -> dict:
+		if self.__defaultDataTemplate is None:
+			self.__defaultDataTemplate = json.loads(
 					open(Server.getInstance().getFilePath() + "src/pymine/resources/command_default.json").read())
 
-		return self.defaultDataTemplate
+		return self.__defaultDataTemplate
 
 	"""
 	:param CommandSender source
@@ -333,7 +315,7 @@ class Command(metaclass = ABCMeta):
 			if isinstance(user, CommandSender):
 				if isinstance(user, ConsoleCommandSender):
 					user.sendMessage(result)
-				elif (user is not source):
+				elif user != source:
 					user.sendMessage(colored)
 
 		"""
@@ -341,4 +323,4 @@ class Command(metaclass = ABCMeta):
 		"""
 
 	def __str__(self):
-		return self.name
+		return self.__name
