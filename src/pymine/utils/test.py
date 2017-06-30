@@ -1,5 +1,10 @@
 # coding=utf-8
+from typing import Mapping
 
-import sys
-after = [str(m) for m in sys.modules]
-print(after)
+plugins = {}
+
+plugins.
+
+plugins['a'] = 1
+
+print(plugins)

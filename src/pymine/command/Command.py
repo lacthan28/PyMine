@@ -1,6 +1,6 @@
 # coding=utf-8
 from pymine.event.TextContainer import TextContainer
-from .CommandSender import *
+from .CommandSender import CommandSender
 from .ConsoleCommandSender import *
 from ..Server import *
 from ..command.CommandMap import *

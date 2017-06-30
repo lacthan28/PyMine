@@ -2,7 +2,9 @@
 from pymine.Server import Server
 from pymine.command.Command import Command
 from pymine.command.CommandMap import CommandMap
+from pymine.command.defaults.HelpCommand import HelpCommand
 from pymine.command.defaults.PluginsCommand import PluginsCommand
+from pymine.command.defaults.SeedCommand import SeedCommand
 from pymine.command.defaults.VersionCommand import VersionCommand
 
 

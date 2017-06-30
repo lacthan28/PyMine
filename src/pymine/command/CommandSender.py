@@ -2,9 +2,9 @@
 from ..permission.Permissible import *
 
 
-class CommandSender(metaclass=ABCMeta, Permissible):
-    def sendMessage(self, message): pass
+class CommandSender(metaclass = ABCMeta, Permissible):
+	def sendMessage(self, message): pass
 
-    def getServer(self): pass
+	def getServer(self) -> Server: pass
 
-    def getName(self): pass
+	def getName(self): pass

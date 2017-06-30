@@ -122,6 +122,10 @@ def function_exists(fun):
 		return False
 
 
+def ksort(d):
+	return [(k, d[k]) for k in sorted(d.keys())]
+
+
 def date(unixtime, _format = '%H:%M:%S'):
 	d = datetime.datetime.fromtimestamp(unixtime)
 	return d.strftime(_format)
